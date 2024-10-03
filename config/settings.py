@@ -27,7 +27,9 @@ ALLOWED_HOSTS = env('ALLOWED_HOSTS')
 # Application definition
 
 INSTALLED_APPS = [
-    # 'jazzmin',
+    # 'modeltranslation',
+
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -38,12 +40,12 @@ INSTALLED_APPS = [
     'rest_framework',
     'drf_yasg',
     'rest_framework_simplejwt',
+    'ckeditor',
 
     #app
     'user',
     'product',
     'order',
-    'common',
 ]
 
 MIDDLEWARE = [
@@ -130,7 +132,7 @@ LANGUAGES = (
     ('ru', _('Russia')),
 )
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Tashkent'
 
 USE_I18N = True
 
@@ -149,6 +151,8 @@ MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 AUTH_USER_MODEL = 'user.User'
+
+CKEDITOR_UPLOAD_PATH = "uploads/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

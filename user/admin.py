@@ -7,8 +7,8 @@ from django.utils.translation import gettext_lazy as _
 @admin.register(models.User)
 class UserModelAdmin(UserAdmin):
     ordering = ('email',)
-    list_display = ['first_name', 'email']
-    list_display_links =['first_name', 'email']
+    list_display = ['first_name', 'email', 'id']
+    list_display_links =['first_name', 'email', 'id']
     search_fields = ("email", "first_name")
     readonly_fields = ['created_at', 'updated_at']
     
