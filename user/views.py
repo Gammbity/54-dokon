@@ -10,6 +10,7 @@ class MeView(RetrieveAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer  
     lookup_field = 'pk' 
+    permission_classes = [IsAuthenticated]
 
     def get_object(self):
         return self.request.user
