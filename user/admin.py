@@ -13,8 +13,8 @@ class UserModelAdmin(UserAdmin):
     readonly_fields = ['created_at', 'updated_at']
     
     fieldsets = (
-        (None, {"fields": ("email", "password")}),
-        (_("Personal info"), {"fields": ("first_name", "phone")}),
+        (None, {"fields": ("username", "email", "password")}),
+        (_("Personal info"), {"fields": ("first_name", "last_name", "phone")}),
         (
             _("Permissions"),
             {

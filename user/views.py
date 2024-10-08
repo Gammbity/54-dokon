@@ -7,14 +7,15 @@ from rest_framework import status
 
 
 class MeView(RetrieveAPIView):
-    serializer_class = UserSerializer
-    # permission_classes = [IsAuthenticated]  
+    queryset = User.objects.all()
+    serializer_class = UserSerializer  
     lookup_field = 'pk' 
 
     def get_object(self):
         return self.request.user
     
 class RegistrationView(GenericAPIView):
+    queryset = User.objects.all()
     serializer_class = RegistrationSerializer
 
     def post(self, request):
