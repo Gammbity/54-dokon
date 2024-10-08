@@ -19,3 +19,20 @@ class ProductTestCase(TestCase):
         response = self.client.get(f"/api/v1/product/product/{2}/")
         self.assertEqual(response.status_code, 200)
         self.assertIn("test2_P", response.data['name'])
+
+class CategoryTestCase(TestCase):
+
+    def setUp(self):
+        models.Category.objects.create(name="test1")
+        models.Category.objects.create(name="test2")
+
+    def test_categories(self):
+        response = self.client.get("/api/v1/product/categories/")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("test1", response.data[0]['name'])
+        self.assertIn("test2", response.data[1]['name'])
+
+    def test_get_category(self):
+        response = self.client.get(f"/api/v1/product/category/{1}/")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("test1", response.data['name'])
