@@ -33,6 +33,7 @@ urlpatterns = [
     #app
     path('api/v1/user/', include('user.urls')),
     path('api/v1/product/', include('product.urls')),
+    path('api/v1/order/', include('order.urls')),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

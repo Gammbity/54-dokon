@@ -16,8 +16,8 @@ class Order(models.Model):
         ("shipped", "jo'natilgan"),
         ("delivered", "yetkazib berildi"),
         ("cancelled", "bekor qilingan")
-    ])
-    total_price = models.PositiveBigIntegerField()
+    ], default="pending")
+    total_price = models.PositiveBigIntegerField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

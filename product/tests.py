@@ -6,8 +6,8 @@ class ProductTestCase(TestCase):
 
     def setUp(self):
         self.category = models.Category.objects.create(name="test_C")
-        models.Product.objects.create(name="test1_P", price="12000$", real_price="10000$", description="test_description", category=self.category)
-        models.Product.objects.create(name="test2_P", price="12000$", real_price="10000$", description="test_description", category=self.category)
+        models.Product.objects.create(name="test1_P", price=12000, real_price="10000$", description="test_description", category=self.category)
+        models.Product.objects.create(name="test2_P", price=12000, real_price="10000$", description="test_description", category=self.category)
 
     def test_list_products(self):
         response = self.client.get("/api/v1/product/products/")
@@ -36,3 +36,4 @@ class CategoryTestCase(TestCase):
         response = self.client.get(f"/api/v1/product/category/{1}/")
         self.assertEqual(response.status_code, 200)
         self.assertIn("test1", response.data['name'])
+

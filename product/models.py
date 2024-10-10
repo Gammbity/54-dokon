@@ -17,7 +17,7 @@ class Category(models.Model):
 class Product(models.Model):
     name = models.CharField(max_length=255)
     real_price = models.CharField(max_length=255)
-    price = models.CharField(max_length=255)
+    price = models.PositiveIntegerField()
     description = RichTextUploadingField()
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
     created_at = models.DateTimeField(auto_now_add=True)
