@@ -8,24 +8,25 @@ import random
 from django.utils.timezone import now
 import os
 import django
+import environ
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+env = environ.Env()
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')  
 django.setup()
 
-db_name = "54"
-db_user = "postgres"
-db_password = "Qwerty123$"
-db_host = "localhost"
-db_port = "5432"
-
 try:
     # PostgreSQL-ga ulanish
     connection= psycopg2.connect(
-        database=db_name,
-        user=db_user,
-        password=db_password,
-        host=db_host,
-        port=db_port
+        database=env('DB_NAME'),
+        user=env('DB_USER'),
+        password=env('DB_PASSWORD'),
+        host=env('DB_HOST'),
+        port=env('DB_PORT')
     )
 
     cursor = connection.cursor()
