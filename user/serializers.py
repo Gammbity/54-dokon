@@ -60,6 +60,7 @@ class RegistrationSerializer(serializers.Serializer):
             'access': str(refresh_token.access_token)
         }
         
-    
-
-            
+class RegistrationBotSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['password']

@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'user',
     'product',
     'order',
+    'bot',
 ]
 
 MIDDLEWARE = [
@@ -92,8 +93,8 @@ DATABASES = {
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': env('DB_NAME', default='54-dokon'), 
-#         'USER': env('DB_USER', default='ChereAdmin'),
+#         'NAME': env('DB_NAME', default='54'), 
+#         'USER': env('DB_USER', default='postgres'),
 #         'PASSWORD': env('DB_PASSWORD'),
 #         'HOST': env('DB_HOST', default='localhost'), 
 #         'PORT': env('DB_PORT', default=5432),
