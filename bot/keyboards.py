@@ -10,4 +10,4 @@ contact_markup = ReplyKeyboardMarkup(keyboard=[
     [
         KeyboardButton(text="Kontakt yuborish", request_contact=True)
     ]
-], resize_keyboard=True, is_persistent=True)
+], resize_keyboard=True, one_time_keyboard=True)

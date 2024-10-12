@@ -41,9 +41,11 @@ async def start_command(message: Message, state:FSMContext):
     cursor.execute("SELECT * FROM user_user WHERE telegram_id = %s", (user_id, ))
     user = cursor.fetchone()
     if user:
+        await message.delete()
         return await send_password(message)
     await message.answer("Kantaktingizni pastdagi tugma orqali kiriting ⬇️", reply_markup=contact_markup)
     await state.set_state(states.Registration.phone)
+    await message.delete()
 
 async def get_contact(message:Message, state:FSMContext):
     now = datetime.now()
@@ -74,7 +76,8 @@ async def recovery_password(callback_data:CallbackQuery):
     time = cursor.fetchone()
     if (now() - time[0]).total_seconds() < 60:
         return await callback_data.answer("Parolingiz hali kuchda! ☝️")
-    await callback_data.message.delete()
+    if 'message' in callback_data:
+        await callback_data.message.delete()
     raqam = random.randint(100000, 999999)
     time = datetime.now()
     cursor.execute("SELECT * FROM user_user WHERE telegram_id=%s", (callback_data.from_user.id,))
