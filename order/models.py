@@ -27,3 +27,14 @@ class Order(models.Model):
     class Meta:
         verbose_name = _("buyurtma")
         verbose_name_plural = _("buyurtmalar")
+
+class Basket(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="basket")
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="basket")
+
+    def __str__(self) -> str:
+        return self.user.get_full_name()
+     
+    class Meta:
+        verbose_name = _("savat")
+        verbose_name_plural = _("savatlar")
