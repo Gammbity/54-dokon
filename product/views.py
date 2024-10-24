@@ -18,3 +18,7 @@ class CategoryListView(generics.ListAPIView):
 class CategoryView(generics.RetrieveAPIView):
     queryset = models.Category.objects.all()
     serializer_class = serializers.CategorySerializer
+
+class ProductImageView(generics.ListAPIView):
+    queryset = models.ProductImage.objects.all()
+    serializer_class = serializers.ProductImageSerializer

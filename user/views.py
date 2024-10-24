@@ -6,6 +6,37 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.utils.timezone import now
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenObtainPairView
+from django.http import JsonResponse
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        data = response.data
+        
+        # Access va refresh tokenlar olish
+        access_token = data.get('access')
+        refresh_token = data.get('refresh')
+        
+        # JWT tokenlarni cookie'ga joylash
+        response = JsonResponse({"message": "Login successful"})
+        response.set_cookie(
+            key='access_token',
+            value=access_token,
+            httponly=True,
+            secure=True,    # Faqat HTTPS orqali yuboriladi
+            samesite='Lax', # CSRF himoyasi uchun
+        )
+        response.set_cookie(
+            key='refresh_token',
+            value=refresh_token,
+            httponly=True,
+            secure=True,
+            samesite='Lax',
+        )
+        
+        return response
 
 class MeView(RetrieveAPIView):
     queryset = User.objects.all()
