@@ -6,8 +6,6 @@ from django.utils.translation import gettext_lazy as _
 
 class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='order')
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='order')
-    quantity = models.PositiveIntegerField(default=1)
     longitude = models.DecimalField(max_digits=9, decimal_places=6)
     latitude = models.DecimalField(max_digits=9, decimal_places=6)
     location = models.CharField(max_length=255)
@@ -27,6 +25,19 @@ class Order(models.Model):
     class Meta:
         verbose_name = _("buyurtma")
         verbose_name_plural = _("buyurtmalar")
+
+class OrderItem(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='order_item')
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_item')
+    price = models.BigIntegerField()
+    quantity = models.BigIntegerField()
+
+    # def __str__(self) -> str:
+    #     return self.order
+    
+    class Meta:
+        verbose_name = _("Buyurtma elementi")
+        verbose_name_plural = _("Buyurtma elementlari")
 
 class Basket(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="basket")

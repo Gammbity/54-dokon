@@ -12,6 +12,13 @@ class OrderListView(generics.ListAPIView):
     def get_queryset(self):
         return models.Order.objects.filter(user=self.request.user) 
     
+class OrderGetView(generics.RetrieveAPIView):
+    serializer_class = serializers.OrderSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return models.Order.objects.filter(user=self.request.user) 
+    
 class OrderCreateView(generics.CreateAPIView):
     queryset = models.Order.objects.all()
     serializer_class = serializers.OrderCreateSerializer
@@ -26,4 +33,5 @@ class BasketListView(generics.ListAPIView):
 class BasketCreateView(generics.CreateAPIView):
     queryset = models.Basket.objects.all()
     serializer_class = serializers.BasketCreateSerializer
+
     
