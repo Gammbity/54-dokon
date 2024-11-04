@@ -8,6 +8,7 @@ from django.utils.timezone import now
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.http import JsonResponse
+from django.utils.translation import gettext_lazy as _
 
 class CustomTokenObtainPairView(TokenObtainPairView):
 
@@ -20,7 +21,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
         refresh_token = data.get('refresh')
         
         # JWT tokenlarni cookie'ga joylash
-        response = JsonResponse({"message": "Login successful"})
+        response = JsonResponse({"message": _("Tizimga kirish muvaffaqiyatli amalga oshirildi")})
         response.set_cookie(
             key='access_token',
             value=access_token,
@@ -71,9 +72,9 @@ class RegistrationWithBotView(GenericAPIView):
                                 'refresh': str(refresh_token),
                                 'access': str(refresh_token.access_token)
                             })
-                    return Response("Parolning faollik muddati 1 daqiqa!")
-            return Response("Parol noto'g'ri!", status=status.HTTP_400_BAD_REQUEST) 
-        return Response("Parol hali yaratilmagan!", status=status.HTTP_400_BAD_REQUEST)
+                    return Response(_("Parolning faollik muddati 1 daqiqa!"))
+            return Response(_("Parol noto'g'ri!"), status=status.HTTP_400_BAD_REQUEST) 
+        return Response(_("Parol hali yaratilmagan!"), status=status.HTTP_400_BAD_REQUEST)
     
     
 

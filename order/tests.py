@@ -23,34 +23,40 @@ class OrderTestCase(TestCase):
             description="test_description", 
             category=self.category
         )
+       
 
     def test_list_orders(self):
         Order.objects.create(
             user = self.user,
-            product = self.product,
-            quantity = 3,
             longitude = 12.342,
             latitude = 45.654,
             location = "Uzbekistan, Tashkent",
         )
-
+       
         response = self.client.get("/api/v1/order/orders/")
         self.assertEqual(response.status_code, 200)
-        self.assertIn('test_P', response.data[0]['product'])
+
+
 
     def test_order_create(self):
         order = {
-            "user":self.user.id,
-            "product":self.product.id,
-            "quantity":3,
-            "longitude":12.123,
-            "latitude":43.654,
-            "location":"Uzbekistan/Tashkent",
+            "user": self.user.id,
+            "longitude": 12.123,
+            "latitude": 43.654,
+            "location": "Uzbekistan/Tashkent",
+            "order_item": [
+                {
+                    "product": self.product.id,
+                    "price": 12000,
+                    "quantity": 3
+                }
+            ]
         }
-
-        response = self.client.post("/api/v1/order/order/create/", data=order)
+        response = self.client.post("/api/v1/order/order/create/", data=order, content_type='application/json')
         self.assertEqual(response.status_code, 201)
-        self.assertIn('product', response.data)
+        self.assertIn('order_item', response.data)
+        self.assertEqual(response.data['location'], "Uzbekistan/Tashkent")
+        self.assertEqual(response.data['order_item'][0]['product'], 1)
 
 
 class BasketTestCase(TestCase):

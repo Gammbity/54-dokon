@@ -32,8 +32,10 @@ class OrderItem(models.Model):
     price = models.BigIntegerField()
     quantity = models.BigIntegerField()
 
-    # def __str__(self) -> str:
-    #     return self.order
+    def __str__(self) -> str:
+        return self.order.user.get_full_name()
+
+    # https://github.com/ozodbekAI/StoreAPI/blob/main/products/views.py
     
     class Meta:
         verbose_name = _("Buyurtma elementi")
