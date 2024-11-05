@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from ckeditor_uploader.fields import RichTextUploadingField
-    
+from django.core.exceptions import ValidationError
 
 class Category(models.Model):
     image = models.ImageField(upload_to='category/')
@@ -23,8 +23,16 @@ class Product(models.Model):
     description = RichTextUploadingField()
     count = models.PositiveBigIntegerField(default=1)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
+    views = models.PositiveBigIntegerField(default=0)
+    likes = models.PositiveBigIntegerField(default=0)
+    rebate = models.PositiveIntegerField(default=0)
+    is_new = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def clean(self) -> None:
+        if self.rebate < 1 and self.rebate > 100:
+            raise ValidationError(_("Ushbu maydon 1 dan 100 gacha qiymatlarni qabul qiladi!"))
 
     def __str__(self) -> str:
         return self.name
