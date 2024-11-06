@@ -20,6 +20,7 @@ class Product(models.Model):
     name = models.CharField(max_length=255)
     real_price = models.CharField(max_length=255)
     price = models.PositiveIntegerField()
+    with_rebate = models.PositiveBigIntegerField(default=0)
     description = RichTextUploadingField()
     count = models.PositiveBigIntegerField(default=1)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
@@ -33,6 +34,9 @@ class Product(models.Model):
     def clean(self) -> None:
         if self.rebate < 1 and self.rebate > 100:
             raise ValidationError(_("Ushbu maydon 1 dan 100 gacha qiymatlarni qabul qiladi!"))
+        
+        self.with_rebate = self.price - (self.price * self.rebate / 100)
+        self.save()
 
     def __str__(self) -> str:
         return self.name

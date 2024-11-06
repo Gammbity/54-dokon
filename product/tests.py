@@ -1,6 +1,9 @@
 from django.test import TestCase
 from product import models
-
+import unittest
+from unittest.mock import patch
+import io
+from product.tasks import schedule_tasks
 
 class ProductTestCase(TestCase):
 
@@ -36,4 +39,3 @@ class CategoryTestCase(TestCase):
         response = self.client.get(f"/api/v1/product/category/{1}/")
         self.assertEqual(response.status_code, 200)
         self.assertIn("test1", response.data['name'])
-

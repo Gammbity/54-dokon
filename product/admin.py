@@ -13,6 +13,7 @@ class ProductAdmin(admin.ModelAdmin):
     list_display = ['name', 'id']
     list_display_links = ['name', 'id']
     inlines = [ImageInline]
+    readonly_fields = ['with_rebate']
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
