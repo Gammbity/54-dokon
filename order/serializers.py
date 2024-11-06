@@ -1,6 +1,8 @@
 from order.models import Order, Basket, OrderItem
 from rest_framework import serializers
 from product.serializers import ProductSerializer
+from django.utils.translation import gettext_lazy as _
+from product.models import Product
 
 class BasketSerializer(serializers.ModelSerializer):
     product = ProductSerializer()
@@ -30,6 +32,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
         ]
 
 class OrderItemCreateSerializer(serializers.ModelSerializer):
+    price = serializers.IntegerField(read_only=True)
     class Meta:
         model = OrderItem
         fields = [
@@ -67,42 +70,40 @@ class OrderCreateSerializer(serializers.ModelSerializer):
             'order_item'
         ]
 
+
     def create(self, validated_data):
         items_data = validated_data.pop('order_item')
         user = self.context['request'].user
-        order = Order.objects.create(user=user, **validated_data)
         total_price = 0
+        order = Order.objects.create(user=user, **validated_data)
         for item_data in items_data:
-            total_price += item_data['price'] * item_data['quantity']
-            OrderItem.objects.create(order=order, **item_data)
-        order.total_price = total_price
-        order.save()
+            total_price += item_data['product'].price * item_data['quantity']
+            if item_data['quantity'] <= item_data['product'].count:
+                item_data['price'] = item_data['product'].price * item_data['quantity']
+                product = Product.objects.get(name=item_data['product'])
+                product.count -= item_data['quantity']
+                OrderItem.objects.create(order=order, **item_data)
+                order.total_price = total_price
+                product.save()
+                order.save()
+            else:
+                raise serializers.ValidationError(_("Ushbu mahsulotlar soni yetarli emas!"))
         return order
-    
-    
-    """
-    
+
+"""
     {
         "longitude": "12.340000",
-        "latitude": "34.210000",
-        "location": "Uzbekistan/Tashkent/Gisht ko'prik 113-uy",
+        "latitude": "32.140000",
+        "location": "Uzbekistan/Tashkent/Gi'sht ko'prik 113-uy",
         "order_item": [
             {
-                "product": 7,
-                "price": 12000,
+                "product": 4,
+                "quantity": 3
+            },
+            {
+                "product": 5,
                 "quantity": 1
-            },
-            {
-                "product": 7,
-                "price": 2000,
-                "quantity": 3
-            },
-            {
-                "product": 7,
-                "price": 1000,
-                "quantity": 3
             }
         ]
-    }   
-    
-    """
+    }
+"""

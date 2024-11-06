@@ -1,9 +1,5 @@
 from django.test import TestCase
 from product import models
-import unittest
-from unittest.mock import patch
-import io
-from product.tasks import schedule_tasks
 
 class ProductTestCase(TestCase):
 
