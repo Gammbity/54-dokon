@@ -74,36 +74,47 @@ class OrderCreateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         items_data = validated_data.pop('order_item')
         user = self.context['request'].user
-        total_price = 0
-        order = Order.objects.create(user=user, **validated_data)
-        for item_data in items_data:
-            total_price += item_data['product'].price * item_data['quantity']
-            if item_data['quantity'] <= item_data['product'].count:
-                item_data['price'] = item_data['product'].price * item_data['quantity']
+        products = {}
+        try:
+            for item_data in items_data:
                 product = Product.objects.get(name=item_data['product'])
+                products[item_data['product']] = product
+                if item_data['quantity'] > product.count:
+                    raise serializers.ValidationError(_("Ushbu mahsulotlar soni yetarli emas!"))
+            order = Order.objects.create(user=user, **validated_data)
+            total_price = 0
+            for item_data in items_data:
+                product = products[item_data['product']]
+                item_data['price'] = product.price * item_data['quantity']
+                total_price += item_data['price'] 
                 product.count -= item_data['quantity']
-                OrderItem.objects.create(order=order, **item_data)
-                order.total_price = total_price
                 product.save()
-                order.save()
-            else:
-                raise serializers.ValidationError(_("Ushbu mahsulotlar soni yetarli emas!"))
+                OrderItem.objects.create(order=order, **item_data)
+            order.total_price = total_price
+            order.save()
+            products.clear()
+        except Exception as e:
+            raise serializers.ValidationError(str(e))
         return order
 
 """
-    {
-        "longitude": "12.340000",
-        "latitude": "32.140000",
-        "location": "Uzbekistan/Tashkent/Gi'sht ko'prik 113-uy",
-        "order_item": [
-            {
-                "product": 4,
-                "quantity": 3
-            },
-            {
-                "product": 5,
-                "quantity": 1
-            }
-        ]
-    }
+        {
+            "longitude": "12.340000",
+            "latitude": "32.140000",
+            "location": "Uzbekistan/Tashkent/Gi'sht ko'prik 113-uy",
+            "order_item": [
+                {
+                    "product": 4,
+                    "quantity": 1
+                },
+                {
+                    "product": 5,
+                    "quantity": 1
+                },
+                {
+                    "product": 3,
+                    "quantity": 1
+                }
+            ]
+        }
 """
