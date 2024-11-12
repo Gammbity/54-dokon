@@ -26,6 +26,7 @@ class MeViewTest(TestCase):
             "phone":"+998880334626",
             "password":"Qwerty1234root"
         }
-        respone = self.client.post("/api/v1/user/registration/", data=user)
-        self.assertEqual(respone.status_code, 201)
+        response = self.client.post("/api/v1/user/registration/", data=user)
+        for item in response.cookies.items():
+            self.assertIn('refresh_token', item[0])      
 

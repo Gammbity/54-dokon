@@ -47,8 +47,7 @@ class OrderTestCase(TestCase):
             "order_item": [
                 {
                     "product": self.product.id,
-                    "price": 12000,
-                    "quantity": 3
+                    "quantity": 1
                 }
             ]
         }

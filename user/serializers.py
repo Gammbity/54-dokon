@@ -11,7 +11,7 @@ import re
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'first_name', 'last_name', 'username', 'email', 'phone']
+        fields = ['id', 'first_name', 'last_name', 'username', 'email', 'phone', 'created_at', 'telegram_id', 'email']
 
 
 class RegistrationSerializer(serializers.Serializer):

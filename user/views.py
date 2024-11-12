@@ -1,61 +1,56 @@
 from user.models import User, UsersPassword
-from rest_framework.generics import RetrieveAPIView, GenericAPIView
+from rest_framework.generics import RetrieveAPIView, CreateAPIView, GenericAPIView
 from user.serializers import UserSerializer, RegistrationSerializer, RegistrationBotSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from django.utils.timezone import now
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.views import TokenObtainPairView
-from django.http import JsonResponse
+from rest_framework.exceptions import AuthenticationFailed
 from django.utils.translation import gettext_lazy as _
-
-class CustomTokenObtainPairView(TokenObtainPairView):
-
-    def post(self, request, *args, **kwargs):
-        response = super().post(request, *args, **kwargs)
-        data = response.data
+from rest_framework.views import APIView
+from django.contrib.auth import login, logout
+from django.http import JsonResponse
         
-        # Access va refresh tokenlar olish
-        access_token = data.get('access')
-        refresh_token = data.get('refresh')
-        
-        # JWT tokenlarni cookie'ga joylash
-        response = JsonResponse({"message": _("Tizimga kirish muvaffaqiyatli amalga oshirildi")})
-        response.set_cookie(
-            key='access_token',
-            value=access_token,
-            httponly=True,
-            secure=True,    # Faqat HTTPS orqali yuboriladi
-            samesite='Lax', # CSRF himoyasi uchun
-        )
-        response.set_cookie(
-            key='refresh_token',
-            value=refresh_token,
-            httponly=True,
-            secure=True,
-            samesite='Lax',
-        )
-        
-        return response
-
-class MeView(RetrieveAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer  
-    lookup_field = 'pk' 
+class LogOutView(APIView):
     permission_classes = [IsAuthenticated]
+    def post(self, request):
+        logout(request)
+        return Response({"message": "Logout seccessfully"})
 
-    def get_object(self):
-        return self.request.user
-    
-class RegistrationView(GenericAPIView):
+
+class RegistrationView(CreateAPIView):
     queryset = User.objects.all()
     serializer_class = RegistrationSerializer
 
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        return Response(serializer.save(), status=status.HTTP_201_CREATED)
+        # serializer.save()
+        if request.user:
+            token = RefreshToken.for_user(request.user)
+            response = JsonResponse({"token" :str(token.access_token), "message": "success"})
+            response.set_cookie(
+                key='refresh_token',
+                value=str(token),
+                httponly=True,
+                secure=True, 
+                samesite='Strict',
+            )
+            return response
+        else: raise AuthenticationFailed(status.HTTP_400_BAD_REQUEST)  
+        
+
+        """{
+            "first_name": "Abduboriy",
+            "last_name": "Abdusamatov",
+            "username": "admin1",
+            "email": "a1@g.com",
+            "phone": "+998880334626",
+            "password": "Qwerty123$",
+            "telegram_id": null
+            }
+    """
     
 class RegistrationWithBotView(GenericAPIView):
     serializer_class = RegistrationBotSerializer
@@ -75,8 +70,12 @@ class RegistrationWithBotView(GenericAPIView):
                     return Response(_("Parolning faollik muddati 1 daqiqa!"))
             return Response(_("Parol noto'g'ri!"), status=status.HTTP_400_BAD_REQUEST) 
         return Response(_("Parol hali yaratilmagan!"), status=status.HTTP_400_BAD_REQUEST)
+
+class MeView(RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer  
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user    
     
-    
-
-
-
