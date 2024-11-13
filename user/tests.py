@@ -29,5 +29,5 @@ class MeViewTest(TestCase):
         response = self.client.post("/api/v1/user/registration/", data=user)
         for item in response.cookies.items():
             self.assertIn('refresh_token', item[0])  
-            self.assertEqual(response.status_code, 201)    
-
+        self.assertEqual(response.status_code, 201)    
+        self.assertIn('access_token', response.data)    

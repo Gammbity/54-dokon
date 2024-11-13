@@ -18,6 +18,18 @@ class LogOutView(APIView):
         logout(request)
         return Response({"message": "Logout seccessfully"})
 
+def response_token_cookie(request):
+    refresh_token = RefreshToken.for_user(request.user)
+    response = Response({"access_token": str(refresh_token.access_token)}, status=status.HTTP_201_CREATED)
+    response.set_cookie(
+        key="refresh_token",
+        value=str(refresh_token),
+        httponly=True,
+        secure=True,
+        samesite="Strict",
+        max_age=3600
+    )
+    return response
 
 class RegistrationView(CreateAPIView):
     queryset = User.objects.all()
@@ -28,17 +40,7 @@ class RegistrationView(CreateAPIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         if request.user:
-            token = RefreshToken.for_user(request.user)
-            response = Response({"token" :str(token.access_token)}, status=status.HTTP_201_CREATED)
-            response.set_cookie(
-                key='refresh_token',
-                value=str(token),
-                httponly=True,
-                secure=True, 
-                samesite='Strict',
-                max_age=3600
-            )
-            return response
+            return response_token_cookie(request)
         else: raise AuthenticationFailed(status.HTTP_400_BAD_REQUEST)  
         
 
@@ -63,11 +65,7 @@ class RegistrationWithBotView(GenericAPIView):
             if generatepasswords:
                 for generatepassword in generatepasswords:
                     if (now() - generatepassword.time).total_seconds() < 60:
-                        refresh_token = RefreshToken.for_user(generatepassword.user)
-                        return Response({
-                                'refresh': str(refresh_token),
-                                'access': str(refresh_token.access_token)
-                            })
+                        return response_token_cookie(generatepassword)
                     return Response(_("Parolning faollik muddati 1 daqiqa!"))
             return Response(_("Parol noto'g'ri!"), status=status.HTTP_400_BAD_REQUEST) 
         return Response(_("Parol hali yaratilmagan!"), status=status.HTTP_400_BAD_REQUEST)
