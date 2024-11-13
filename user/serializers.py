@@ -8,6 +8,11 @@ from rest_framework_simplejwt.tokens import RefreshToken
 import re
 
 
+class LoginSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username', 'password']
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

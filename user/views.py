@@ -1,6 +1,6 @@
 from user.models import User, UsersPassword
 from rest_framework.generics import RetrieveAPIView, CreateAPIView, GenericAPIView
-from user.serializers import UserSerializer, RegistrationSerializer, RegistrationBotSerializer
+from user.serializers import UserSerializer, RegistrationSerializer, RegistrationBotSerializer, LoginSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
@@ -10,17 +10,11 @@ from rest_framework.exceptions import AuthenticationFailed
 from django.utils.translation import gettext_lazy as _
 from rest_framework.views import APIView
 from django.contrib.auth import login, logout
-from django.http import JsonResponse
-        
-class LogOutView(APIView):
-    permission_classes = [IsAuthenticated]
-    def post(self, request):
-        logout(request)
-        return Response({"message": "Logout seccessfully"})
+from django.contrib.auth.hashers import check_password
 
 def response_token_cookie(request):
     refresh_token = RefreshToken.for_user(request.user)
-    response = Response({"access_token": str(refresh_token.access_token)}, status=status.HTTP_201_CREATED)
+    response = Response({"access_token": str(refresh_token.access_token), "message": "Muvaffaqiyatli amalga oshirildi"})
     response.set_cookie(
         key="refresh_token",
         value=str(refresh_token),
@@ -30,6 +24,29 @@ def response_token_cookie(request):
         max_age=3600
     )
     return response
+
+class LoginView(GenericAPIView):
+    serializer_class = LoginSerializer
+
+    def post(self, request, *args, **kwargs):
+        username = request.data.get('username')
+        password = request.data.get('password')
+        if not username or not password:
+            return Response({"message": "username va parolni kiritish majburiy"}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            user = User.objects.get(username=username)
+            if check_password(password, user.password):
+                login(request, user)
+                return response_token_cookie(request)
+            else: return Response({"message": "Parol noto'g'ri"}, status=status.HTTP_400_BAD_REQUEST)
+        except:  
+            return Response({"message": f"{username} ushbu username mavjud emas"}, status=status.HTTP_400_BAD_REQUEST)
+
+class LogOutView(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request):
+        logout(request)
+        return Response({"message": "Tizidan chiqish muvaffaqiyatli amalga oshirildi"})
 
 class RegistrationView(CreateAPIView):
     queryset = User.objects.all()
@@ -77,4 +94,4 @@ class MeView(RetrieveAPIView):
 
     def get_object(self):
         return self.request.user    
-    
+
