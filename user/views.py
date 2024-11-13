@@ -26,16 +26,17 @@ class RegistrationView(CreateAPIView):
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        # serializer.save()
+        serializer.save()
         if request.user:
             token = RefreshToken.for_user(request.user)
-            response = JsonResponse({"token" :str(token.access_token), "message": "success"})
+            response = Response({"token" :str(token.access_token)}, status=status.HTTP_201_CREATED)
             response.set_cookie(
                 key='refresh_token',
                 value=str(token),
                 httponly=True,
                 secure=True, 
                 samesite='Strict',
+                max_age=3600
             )
             return response
         else: raise AuthenticationFailed(status.HTTP_400_BAD_REQUEST)  
