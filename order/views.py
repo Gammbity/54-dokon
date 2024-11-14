@@ -1,7 +1,5 @@
-from django.shortcuts import render
 from order import models, serializers
-from rest_framework import generics, status
-from rest_framework.response import Response
+from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 
 

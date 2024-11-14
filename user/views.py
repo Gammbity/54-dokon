@@ -14,7 +14,7 @@ from django.contrib.auth.hashers import check_password
 
 def response_token_cookie(request):
     refresh_token = RefreshToken.for_user(request.user)
-    response = Response({"access_token": str(refresh_token.access_token), "message": "Muvaffaqiyatli amalga oshirildi"})
+    response = Response({"access_token": str(refresh_token.access_token), "message": _("Muvaffaqiyatli amalga oshirildi")})
     response.set_cookie(
         key="refresh_token",
         value=str(refresh_token),
@@ -32,7 +32,7 @@ class LoginView(GenericAPIView):
         username = request.data.get('username')
         password = request.data.get('password')
         if not username or not password:
-            return Response({"message": "username va parolni kiritish majburiy"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": _("username va parolni kiritish majburiy")}, status=status.HTTP_400_BAD_REQUEST)
         try:
             user = User.objects.get(username=username)
             if check_password(password, user.password):
@@ -40,13 +40,15 @@ class LoginView(GenericAPIView):
                 return response_token_cookie(request)
             else: return Response({"message": "Parol noto'g'ri"}, status=status.HTTP_400_BAD_REQUEST)
         except:  
-            return Response({"message": f"{username} ushbu username mavjud emas"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": _(f"{username} ushbu username mavjud emas")}, status=status.HTTP_400_BAD_REQUEST)
 
 class LogOutView(APIView):
     permission_classes = [IsAuthenticated]
     def post(self, request):
         logout(request)
-        return Response({"message": "Tizidan chiqish muvaffaqiyatli amalga oshirildi"})
+        response = Response({"message": _("Tizimdan chiqish muvaffaqiyatli amalga oshirildi")})
+        response.delete_cookie('refresh_token')
+        return response
 
 class RegistrationView(CreateAPIView):
     queryset = User.objects.all()
