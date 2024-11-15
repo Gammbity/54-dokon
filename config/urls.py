@@ -5,6 +5,9 @@ from django.conf import settings
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
+from rest_framework_simplejwt.views import (
+    TokenRefreshView
+)
 
 schema_view = get_schema_view(
    openapi.Info(
@@ -20,14 +23,15 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-    path('', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    path('admin/', admin.site.urls),
-    path('ckeditor/', include('ckeditor_uploader.urls')),
+   path('', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+   path('admin/', admin.site.urls),
+   path('ckeditor/', include('ckeditor_uploader.urls')),
+   path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
-    #app
-    path('api/v1/user/', include('user.urls')),
-    path('api/v1/product/', include('product.urls')),
-    path('api/v1/order/', include('order.urls')),
+   #app
+   path('api/v1/user/', include('user.urls')),
+   path('api/v1/product/', include('product.urls')),
+   path('api/v1/order/', include('order.urls')),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

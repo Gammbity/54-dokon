@@ -7,6 +7,11 @@ from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework_simplejwt.tokens import RefreshToken
 import re
 
+class RefreshTokenSerializer(serializers.ModelSerializer):
+    refresh_token = serializers.CharField()
+    class Meta:
+        model = User
+        fields = ['refresh_token']
 
 class LoginSerializer(serializers.ModelSerializer):
     class Meta:
@@ -17,7 +22,6 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'first_name', 'last_name', 'username', 'email', 'phone', 'created_at', 'telegram_id', 'email']
-
 
 class RegistrationSerializer(serializers.Serializer):
     email = serializers.EmailField()

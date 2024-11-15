@@ -1,6 +1,6 @@
 from user.models import User, UsersPassword
-from rest_framework.generics import RetrieveAPIView, CreateAPIView, GenericAPIView
-from user.serializers import UserSerializer, RegistrationSerializer, RegistrationBotSerializer, LoginSerializer
+from rest_framework import generics
+from user import serializers
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
@@ -11,6 +11,10 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework.views import APIView
 from django.contrib.auth import login, logout
 from django.contrib.auth.hashers import check_password
+import jwt
+from datetime import datetime
+from config.settings import SECRET_KEY
+from datetime import timedelta
 
 def response_token_cookie(request):
     refresh_token = RefreshToken.for_user(request.user)
@@ -25,8 +29,8 @@ def response_token_cookie(request):
     )
     return response
 
-class LoginView(GenericAPIView):
-    serializer_class = LoginSerializer
+class LoginView(generics.GenericAPIView):
+    serializer_class = serializers.LoginSerializer
 
     def post(self, request, *args, **kwargs):
         username = request.data.get('username')
@@ -50,9 +54,9 @@ class LogOutView(APIView):
         response.delete_cookie('refresh_token')
         return response
 
-class RegistrationView(CreateAPIView):
+class RegistrationView(generics.CreateAPIView):
     queryset = User.objects.all()
-    serializer_class = RegistrationSerializer
+    serializer_class =serializers.RegistrationSerializer
 
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
@@ -74,8 +78,8 @@ class RegistrationView(CreateAPIView):
             }
     """
     
-class RegistrationWithBotView(GenericAPIView):
-    serializer_class = RegistrationBotSerializer
+class RegistrationWithBotView(generics.GenericAPIView):
+    serializer_class = serializers.RegistrationBotSerializer
     
     def post(self, request, *args, **kwargs):
         password = request.data['password']
@@ -89,11 +93,27 @@ class RegistrationWithBotView(GenericAPIView):
             return Response(_("Parol noto'g'ri!"), status=status.HTTP_400_BAD_REQUEST) 
         return Response(_("Parol hali yaratilmagan!"), status=status.HTTP_400_BAD_REQUEST)
 
-class MeView(RetrieveAPIView):
+class MeView(generics.RetrieveAPIView):
     queryset = User.objects.all()
-    serializer_class = UserSerializer  
+    serializer_class = serializers.UserSerializer  
     permission_classes = [IsAuthenticated]
 
     def get_object(self):
         return self.request.user    
 
+class RefreshTokenView(generics.CreateAPIView):
+    serializer_class = serializers.RefreshTokenSerializer
+
+    def post(self, request, *args, **kwargs):
+        token = request.data['refresh_token']
+        if token:
+            payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+            exp_time = datetime.fromtimestamp(payload['exp']) # 'exp': 1732280262, 1970-yil 1-yanvar 00:00:00 UTC dan boshlab soniyalarda hisoblangan vaqtni ko'rsatadi.
+            if exp_time > datetime.now() - timedelta(days=10):
+                token = RefreshToken.for_user(request.user)
+                return Response({'refresh_token': str(token.access_token)}, status.HTTP_200_OK)
+            else: 
+                return Response({"message": _("Token muddati o'tib ketgan")})
+        else:
+            return Response({"message": _("refresh_token mavjud emas")}) 
+        
