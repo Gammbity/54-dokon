@@ -3,6 +3,12 @@ from user import models
 from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import gettext_lazy as _
 
+@admin.register(models.UsersPassword)
+class UserPasswordAdmin(admin.ModelAdmin):
+    list_display = ['user', 'password']
+    list_display_links = ['user', 'password']
+    readonly_fields = ['user', 'password']
+
 
 @admin.register(models.User)
 class UserModelAdmin(UserAdmin):

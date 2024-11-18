@@ -73,3 +73,8 @@ class RegistrationBotSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['password']
+
+class UsernamePasswordSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username', 'password']

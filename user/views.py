@@ -117,3 +117,26 @@ class RefreshTokenView(generics.CreateAPIView):
         else:
             return Response({"message": _("refresh_token mavjud emas")}) 
         
+class UsernamePasswordEditView(generics.GenericAPIView):
+    serializer_class = serializers.UsernamePasswordSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = User.objects.get(id=request.user.id)
+        username = user.username
+        if username:
+            return Response({"username": username})
+        else:
+            return Response({"username": ""})
+
+    def post(self, request, *args, **kwargs):
+        user = User.objects.get(id=request.user.id)
+        username = request['username']
+        password = request['password']
+        if username and password:
+            user.username = username
+            user.password = password
+            user.save()
+            return Response(status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)

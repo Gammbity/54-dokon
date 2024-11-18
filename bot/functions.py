@@ -38,7 +38,7 @@ except (Exception, psycopg2.Error) as error:
 
 async def start_command(message: Message, state:FSMContext):
     user_id = message.from_user.id
-    cursor.execute("SELECT * FROM user_user WHERE telegram_id = %s", (user_id, ))
+    cursor.execute("SELECT * FROM user_user WHERE telegram_id = %s", (user_id,))
     user = cursor.fetchone()
     if user:
         await message.delete()
@@ -63,8 +63,8 @@ async def send_password(message: Message):
     password = random.randint(1000000, 9999999)
     time = datetime.now()
     cursor.execute("SELECT id FROM user_user WHERE telegram_id=%s", (message.from_user.id,))
-    user_id = cursor.fetchall()
-    cursor.execute("INSERT INTO user_userspassword(password, time, user_id) VALUES (%s, %s, %s)", (password, time, user_id[0][0]))
+    user_id = cursor.fetchall() 
+    cursor.execute("INSERT INTO user_userspassword(password, time, user_id) VALUES (%s, %s, %s)",(password, time, user_id[0][0]))
     connection.commit()
     await message.answer(str(password), reply_markup=password_recovery)
 
