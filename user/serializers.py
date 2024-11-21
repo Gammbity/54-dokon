@@ -7,6 +7,22 @@ from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework_simplejwt.tokens import RefreshToken
 import re
 
+class ChangePasswordSerializer(serializers.ModelSerializer):
+    new_password = serializers.CharField()
+    new_password_again = serializers.CharField()
+    class Meta:
+        model = User
+        fields = ['password', 'new_password', 'new_password_again']
+
+    def validate_new_password(self, data):
+        if data == self.new_password_again:
+            try:
+                validate_password(data)
+            except DjangoValidationError as e:
+                raise ({"error": e})
+        else:
+            return ({"message": _("Parollar bir hil emas!")})
+
 class RefreshTokenSerializer(serializers.ModelSerializer):
     refresh_token = serializers.CharField()
     class Meta:

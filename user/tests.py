@@ -2,7 +2,7 @@ from django.test import TestCase
 from user.models import User
 
 
-class MeViewTest(TestCase):
+class UserViewTest(TestCase):
 
     def test_get_user(self):
         self.user = User.objects.create_user(

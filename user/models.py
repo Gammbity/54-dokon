@@ -12,7 +12,7 @@ class User(AbstractUser):
     email = models.EmailField(unique=True, null=True)
 
     def __str__(self) -> str:
-        return self.get_full_name()
+        return self.username
 
     class Meta:
         verbose_name = _("foydalanuvchi")

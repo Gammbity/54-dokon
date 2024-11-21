@@ -9,15 +9,16 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.exceptions import AuthenticationFailed
 from django.utils.translation import gettext_lazy as _
 from rest_framework.views import APIView
-from django.contrib.auth import login, logout
+from django.contrib.auth import login
 from django.contrib.auth.hashers import check_password
 import jwt
 from datetime import datetime
 from config.settings import SECRET_KEY
 from datetime import timedelta
 
-def response_token_cookie(request):
-    refresh_token = RefreshToken.for_user(request.user)
+
+def response_token_cookie(user):
+    refresh_token = RefreshToken.for_user(user)
     response = Response({"access_token": str(refresh_token.access_token), "message": _("Muvaffaqiyatli amalga oshirildi")})
     response.set_cookie(
         key="refresh_token",
@@ -39,19 +40,20 @@ class LoginView(generics.GenericAPIView):
             return Response({"message": _("username va parolni kiritish majburiy")}, status=status.HTTP_400_BAD_REQUEST)
         try:
             user = User.objects.get(username=username)
-            if check_password(password, user.password):
-                login(request, user)
-                return response_token_cookie(request)
-            else: return Response({"message": "Parol noto'g'ri"}, status=status.HTTP_400_BAD_REQUEST)
-        except:  
+        except User.DoesNotExist as e:
             return Response({"message": _(f"{username} ushbu username mavjud emas")}, status=status.HTTP_400_BAD_REQUEST)
-
+        if check_password(password, user.password):
+            request.user = user
+            request.session['user_id'] = user.id
+            return response_token_cookie(user)
+        else: return Response({"message": _("Parol noto'g'ri")}, status=status.HTTP_400_BAD_REQUEST)
+            
 class LogOutView(APIView):
     permission_classes = [IsAuthenticated]
     def post(self, request):
-        logout(request)
         response = Response({"message": _("Tizimdan chiqish muvaffaqiyatli amalga oshirildi")})
         response.delete_cookie('refresh_token')
+        request.session.flush()
         return response
 
 class RegistrationView(generics.CreateAPIView):
@@ -59,11 +61,12 @@ class RegistrationView(generics.CreateAPIView):
     serializer_class =serializers.RegistrationSerializer
 
     def post(self, request):
+        user = request.user
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        if request.user:
-            return response_token_cookie(request)
+        if user:
+            return response_token_cookie(user)
         else: raise AuthenticationFailed(status.HTTP_400_BAD_REQUEST)  
         
 
@@ -88,7 +91,8 @@ class RegistrationWithBotView(generics.GenericAPIView):
             if generatepasswords:
                 for generatepassword in generatepasswords:
                     if (now() - generatepassword.time).total_seconds() < 60:
-                        return response_token_cookie(generatepassword)
+                        user = generatepassword.user
+                        return response_token_cookie(user)
                     return Response(_("Parolning faollik muddati 1 daqiqa!"))
             return Response(_("Parol noto'g'ri!"), status=status.HTTP_400_BAD_REQUEST) 
         return Response(_("Parol hali yaratilmagan!"), status=status.HTTP_400_BAD_REQUEST)
@@ -105,13 +109,15 @@ class RefreshTokenView(generics.CreateAPIView):
     serializer_class = serializers.RefreshTokenSerializer
 
     def post(self, request, *args, **kwargs):
-        token = request.data['refresh_token']
+        token = request.data.get('refresh_token')
         if token:
             payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
             exp_time = datetime.fromtimestamp(payload['exp']) # 'exp': 1732280262, 1970-yil 1-yanvar 00:00:00 UTC dan boshlab soniyalarda hisoblangan vaqtni ko'rsatadi.
             if exp_time > datetime.now() - timedelta(days=10):
-                token = RefreshToken.for_user(request.user)
-                return Response({'refresh_token': str(token.access_token)}, status.HTTP_200_OK)
+                token = RefreshToken(token)
+                token.blacklist()
+                new_token = RefreshToken.for_user(request.user)
+                return Response({'refresh_token': str(new_token.access_token)}, status.HTTP_200_OK)
             else: 
                 return Response({"message": _("Token muddati o'tib ketgan")})
         else:
@@ -140,3 +146,14 @@ class UsernamePasswordEditView(generics.GenericAPIView):
             return Response(status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+
+class ChangePasswordView(generics.GenericAPIView):
+    serializer_class = serializers.ChangePasswordSerializer
+
+    def post(self, request, *args, **kwargs):
+        user_id = request.user.id
+        user = User.objects.get(id=user_id)
+        user.password = request['new_password']
+        user.save()
+        return Response(status.HTTP_200_OK)
+    
