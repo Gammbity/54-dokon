@@ -1,6 +1,11 @@
 from rest_framework import serializers
 from product import models
 
+class CommentDelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Comment
+        fields = ['id']
+
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Comment

@@ -72,7 +72,7 @@ class Comment(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='comment')
     text = models.TextField()
     degree = models.IntegerField(default=1)
-    # created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
         return self.user.get_full_name()
@@ -80,3 +80,4 @@ class Comment(models.Model):
     class Meta:
         verbose_name = _("Izoh")
         verbose_name_plural = _("Izohlar")
+        ordering = ['-degree']

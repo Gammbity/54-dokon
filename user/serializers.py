@@ -79,12 +79,8 @@ class RegistrationSerializer(serializers.Serializer):
             phone=validated_data['phone'],
             username=validated_data['username']
         )
-        refresh_token = RefreshToken.for_user(user)
-        return {
-            'refresh': str(refresh_token),
-            'access': str(refresh_token.access_token)
-        }
-        
+        return user
+    
 class RegistrationBotSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

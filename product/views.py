@@ -1,6 +1,10 @@
 from rest_framework import generics
 from product import models
 from product import serializers
+from rest_framework.permissions import IsAuthenticated
+from django.shortcuts import get_object_or_404
+from rest_framework.response import Response
+from rest_framework import status
 
 class ProductListView(generics.ListAPIView):
     queryset = models.Product.objects.order_by('?')
@@ -20,9 +24,15 @@ class CategoryView(generics.RetrieveAPIView):
     serializer_class = serializers.CategorySerializer
     lookup_field = 'slug'
 
+class CommentCreateView(generics.CreateAPIView):
+    serializer_class = serializers.CommentCreateSerializer
+    queryset = models.Comment.objects.all()
+    permission_classes = [IsAuthenticated]
 
-# class CommentCreateView(generics.CreateAPIView):
-#     serializer_class = serializers.CommentCreateSerializer
-
-#     def create(self, request, *args, **kwargs):
-#         comment = models.Comment.objects.
+class CommentDelView(generics.DestroyAPIView):
+    serializer_class = serializers.CommentDelSerializer
+    
+    def delete(self, request, *args, **kwargs):
+        comment = get_object_or_404(models.Comment, pk=kwargs['pk'], user=request.user)
+        comment.delete()
+        return Response({"message", "Izoh muvaffaqiyatli o'chirildi"}, status.HTTP_204_NO_CONTENT)
