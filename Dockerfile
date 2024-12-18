@@ -1,5 +1,6 @@
-FROM python:3:slim
+FROM python:3.10-slim
 
-COPY . /
+COPY / .
 
 
+CMD [ "py", "bot_start.py" ]
