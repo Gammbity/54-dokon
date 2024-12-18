@@ -22,6 +22,7 @@ class Category(models.Model):
     class Meta:
         verbose_name = _("kategoriya")
         verbose_name_plural = _("kategoriyalar")
+        ordering = ['-created_at']
 
 class Product(models.Model):
     name = models.CharField(max_length=255)
@@ -54,6 +55,7 @@ class Product(models.Model):
     class Meta:
         verbose_name = _("mahsulot")
         verbose_name_plural = _("mahsulotlar")
+        ordering = ['-created_at']
 
 class ProductImage(models.Model):
     image = models.ImageField(upload_to='product/')

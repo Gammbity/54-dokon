@@ -17,6 +17,7 @@ class User(AbstractUser):
     class Meta:
         verbose_name = _("foydalanuvchi")
         verbose_name_plural = _("foydalanuvchilar")
+        ordering = ['-created_at']
 
 
 class UsersPassword(models.Model):
@@ -30,4 +31,5 @@ class UsersPassword(models.Model):
     class Meta:
         verbose_name = _("foydalanuvchi paroli")
         verbose_name = _("foydalanuvchi parollari")
+        ordering = ['-time']
 
