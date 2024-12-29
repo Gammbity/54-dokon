@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-
 from django.utils.translation import gettext_lazy as _
 
 class User(AbstractUser):
@@ -10,6 +9,7 @@ class User(AbstractUser):
     updated_at = models.DateTimeField(auto_now=True)
     telegram_id = models.PositiveBigIntegerField(unique=True, null=True, blank=True)
     email = models.EmailField(unique=True, null=True)
+
 
     def __str__(self) -> str:
         return self.username

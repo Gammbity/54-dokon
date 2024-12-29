@@ -44,6 +44,7 @@ class LoginView(generics.GenericAPIView):
         if check_password(password, user.password):
             login(request, user)
             response = response_token_cookie(user)
+            print(**response.data)
             return Response({**response.data, "message": _("Login muvaffaqiyatli amalga oshirildi")},status=status.HTTP_200_OK)
         else: return Response({"message": _("Parol noto'g'ri")}, status=status.HTTP_400_BAD_REQUEST)
             
@@ -69,25 +70,14 @@ class RegistrationView(generics.CreateAPIView):
             return Response({**response.data, "message": _("Registration muvaffaqiyatli amalga oshirildi")},status=status.HTTP_201_CREATED)
         else: raise AuthenticationFailed(status.HTTP_400_BAD_REQUEST)  
         
-
-        """{
-            "first_name": "Abduboriy",
-            "last_name": "Abdusamatov",
-            "username": "admin1",
-            "email": "a1@g.com",
-            "phone": "+998880334626",
-            "password": "Qwerty123$",
-            "telegram_id": null
-            }
-    """
     
 class RegistrationWithBotView(generics.GenericAPIView):
     serializer_class = serializers.RegistrationBotSerializer
     
     def post(self, request, *args, **kwargs):
-        password = request.data['password']
-        generatepasswords = UsersPassword.objects.filter(password=password)
-        if password:
+        if request.data['password']:
+            password = int(request.data['password'])
+            generatepasswords = UsersPassword.objects.filter(password=password)
             if generatepasswords:
                 for generatepassword in generatepasswords:
                     if (now() - generatepassword.time).total_seconds() < 60:

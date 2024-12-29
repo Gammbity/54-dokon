@@ -96,25 +96,3 @@ class OrderCreateSerializer(serializers.ModelSerializer):
         except Exception as e:
             raise serializers.ValidationError(str(e))
         return order
-
-"""
-        {
-            "longitude": "12.340000",
-            "latitude": "32.140000",
-            "location": "Uzbekistan/Tashkent/Gi'sht ko'prik 113-uy",
-            "order_item": [
-                {
-                    "product": 4,
-                    "quantity": 1
-                },
-                {
-                    "product": 5,
-                    "quantity": 1
-                },
-                {
-                    "product": 3,
-                    "quantity": 1
-                }
-            ]
-        }
-"""

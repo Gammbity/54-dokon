@@ -20,7 +20,8 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 SECRET_KEY = env("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env("DEBUG")
+
+DEBUG = bool(env("DEBUG"))
 
 ALLOWED_HOSTS = env("ALLOWED_HOSTS")
 
@@ -144,12 +145,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
-SATIC_ROOT = BASE_DIR / 'static'
+STATIC_ROOT = BASE_DIR / 'static'
 
 STATICFILES_DIRS = BASE_DIR / 'assets',
 
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
 
 AUTH_USER_MODEL = 'user.User'
 
@@ -173,6 +175,11 @@ REST_FRAMEWORK = {
 
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
+
+CELERY_BROKER_URL = 'redis://localhost:6380/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+
 
 SIMPLE_JWT = {
 
@@ -283,7 +290,7 @@ JAZZMIN_SETTINGS = {
     }
 }
 
-try:
-    from config.local_settings import *
-except ImportError:
-    pass
+# try:
+#     from config.local_settings import *
+# except ImportError:
+#     pass

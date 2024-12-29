@@ -11,7 +11,11 @@ def main():
     try:
         from django.core.management import execute_from_command_line
         # Start the scheduling in a separate thread after Django is set up
-        threading.Thread(target=schedule_tasks, daemon=True).start()
+        is_local_settings = os.path.isfile('config/local_settings.py')
+        if is_local_settings:
+            threading.Thread(target=schedule_tasks, daemon=True).start()
+        else:
+            pass
     except ImportError as exc:
         raise ImportError(
             "Couldn't import Django. Are you sure it's installed and "

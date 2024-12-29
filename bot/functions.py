@@ -58,6 +58,7 @@ async def get_contact(message:Message, state:FSMContext):
                    (now, False, username, first_name, last_name, None, False, True, now, None, phone, now, now, id))
     connection.commit()
     await state.set_state(states.Registration.login)
+    await send_password(message)
 
 async def send_password(message: Message):
     password = random.randint(1000000, 9999999)
@@ -86,3 +87,4 @@ async def recovery_password(callback_data:CallbackQuery):
     cursor.execute("INSERT INTO user_userspassword(password, time, user_id) VALUES (%s, %s, %s)", (raqam, time, user_id))
     connection.commit()
     await callback_data.message.answer(str(raqam), reply_markup=password_recovery)
+    await callback_data.message.delete()
