@@ -44,7 +44,6 @@ class LoginView(generics.GenericAPIView):
         if check_password(password, user.password):
             login(request, user)
             response = response_token_cookie(user)
-            print(**response.data)
             return Response({**response.data, "message": _("Login muvaffaqiyatli amalga oshirildi")},status=status.HTTP_200_OK)
         else: return Response({"message": _("Parol noto'g'ri")}, status=status.HTTP_400_BAD_REQUEST)
             
@@ -66,27 +65,28 @@ class RegistrationView(generics.CreateAPIView):
         user = serializer.save()
         login(request, user)
         if user.is_authenticated:
-            response = response_token_cookie(user)
+            response = response_token_cookie(user)   
             return Response({**response.data, "message": _("Registration muvaffaqiyatli amalga oshirildi")},status=status.HTTP_201_CREATED)
         else: raise AuthenticationFailed(status.HTTP_400_BAD_REQUEST)  
         
     
-class RegistrationWithBotView(generics.GenericAPIView):
+class LoginWithBotView(generics.GenericAPIView):
     serializer_class = serializers.RegistrationBotSerializer
     
     def post(self, request, *args, **kwargs):
         if request.data['password']:
             password = int(request.data['password'])
-            generatepasswords = UsersPassword.objects.filter(password=password)
-            if generatepasswords:
-                for generatepassword in generatepasswords:
-                    if (now() - generatepassword.time).total_seconds() < 60:
-                        user = generatepassword.user
-                        respone = response_token_cookie(user)
-                        return Response({**respone.data, "message": _("Registration muvaffaqiyatli amalga oshirildi")},status=status.HTTP_201_CREATED)
-                    return Response(_("Parolning faollik muddati 1 daqiqa!"))
-            return Response(_("Parol noto'g'ri!"), status=status.HTTP_400_BAD_REQUEST) 
-        return Response(_("Parol hali yaratilmagan!"), status=status.HTTP_400_BAD_REQUEST)
+            generatepassword = UsersPassword.objects.get(password=password)
+            if generatepassword:
+                time_diff = int((now() - generatepassword.time).total_seconds())
+                if time_diff <= 10000:
+                    user = generatepassword.user
+                    response = Response({"message": _("Registration muvaffaqiyatli amalga oshirildi")}, status=status.HTTP_201_CREATED)
+                    response = response_token_cookie(user)
+                    return Response({**response.data, "message": _("Registration muvaffaqiyatli amalga oshirildi")},status=status.HTTP_201_CREATED)
+                else:return Response(_("Parolning faollik muddati 1 daqiqa!"), status=status.HTTP_400_BAD_REQUEST)
+            else:return Response(_("Parol noto'g'ri!"), status=status.HTTP_400_BAD_REQUEST) 
+        else:return Response(_("Parol hali yaratilmagan!"), status=status.HTTP_400_BAD_REQUEST)
 
 class MeView(generics.RetrieveAPIView):
     queryset = User.objects.all()

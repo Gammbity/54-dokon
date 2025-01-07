@@ -26,7 +26,7 @@ class UsersPassword(models.Model):
     time = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
-        return self.user
+        return self.user.username
     
     class Meta:
         verbose_name = _("foydalanuvchi paroli")
