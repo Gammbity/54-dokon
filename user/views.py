@@ -15,10 +15,12 @@ import jwt
 from datetime import datetime
 from config.settings import SECRET_KEY
 from datetime import timedelta
+from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 
-def response_token_cookie(user):
+def response_token_cookie(user, message):
     refresh_token = RefreshToken.for_user(user)
-    response = Response({"access_token": str(refresh_token.access_token)})
+    access = {str(refresh_token.access_token)}
+    response = Response({'access_token': access}, message)
     response.set_cookie(
         key="refresh_token",
         value=str(refresh_token),
@@ -43,17 +45,31 @@ class LoginView(generics.GenericAPIView):
             return Response({"message": _(f"{username} ushbu username mavjud emas")}, status=status.HTTP_400_BAD_REQUEST)
         if check_password(password, user.password):
             login(request, user)
-            response = response_token_cookie(user)
-            return Response({**response.data, "message": _("Login muvaffaqiyatli amalga oshirildi")},status=status.HTTP_200_OK)
+            response = response_token_cookie(user, 200)
+            return response
         else: return Response({"message": _("Parol noto'g'ri")}, status=status.HTTP_400_BAD_REQUEST)
-            
+         
 class LogOutView(APIView):
     permission_classes = [IsAuthenticated]
     def post(self, request):
-        response = Response({"message": _("Tizimdan chiqish muvaffaqiyatli amalga oshirildi")})
-        response.delete_cookie('refresh_token')
-        request.session.flush()
-        return response
+        try:
+            auth_header = request.headers.get('X-Refresh-Token')
+            print(auth_header)
+            if not auth_header or not auth_header.startswith('Bearer '):
+                return Response({'error': _("Noto'g'ri token1")}, status=status.HTTP_401_UNAUTHORIZED)
+            refresh_token = auth_header.split(' ')[1]
+            print()
+            print(refresh_token)
+            token = RefreshToken(refresh_token)
+            print(token)
+            token.verify()
+            token.blacklist()
+            response = Response({'message':_("Tizimdan chiqish muvaffaqiyatli amalga oshirildi")})
+            response.delete_cookie('refresh_token', samesite='Strict', secure=True)
+            request.session.flush()
+            return response
+        except (InvalidToken, TokenError):
+            return Response({"error": "Noto'g'ri token"}, status=status.HTTP_401_UNAUTHORIZED)
 
 class RegistrationView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -65,8 +81,8 @@ class RegistrationView(generics.CreateAPIView):
         user = serializer.save()
         login(request, user)
         if user.is_authenticated:
-            response = response_token_cookie(user)   
-            return Response({**response.data, "message": _("Registration muvaffaqiyatli amalga oshirildi")},status=status.HTTP_201_CREATED)
+            response = response_token_cookie(user, 201)   
+            return response
         else: raise AuthenticationFailed(status.HTTP_400_BAD_REQUEST)  
         
     
@@ -81,9 +97,8 @@ class LoginWithBotView(generics.GenericAPIView):
                 time_diff = int((now() - generatepassword.time).total_seconds())
                 if time_diff <= 10000:
                     user = generatepassword.user
-                    response = Response({"message": _("Registration muvaffaqiyatli amalga oshirildi")}, status=status.HTTP_201_CREATED)
-                    response = response_token_cookie(user)
-                    return Response({**response.data, "message": _("Registration muvaffaqiyatli amalga oshirildi")},status=status.HTTP_201_CREATED)
+                    response = response_token_cookie(user, 201)
+                    return response
                 else:return Response(_("Parolning faollik muddati 1 daqiqa!"), status=status.HTTP_400_BAD_REQUEST)
             else:return Response(_("Parol noto'g'ri!"), status=status.HTTP_400_BAD_REQUEST) 
         else:return Response(_("Parol hali yaratilmagan!"), status=status.HTTP_400_BAD_REQUEST)
@@ -108,7 +123,7 @@ class RefreshTokenView(generics.CreateAPIView):
                 token = RefreshToken(token)
                 token.blacklist()
                 new_token = RefreshToken.for_user(request.user)
-                return Response({'refresh_token': str(new_token.access_token)}, status.HTTP_200_OK)
+                return Response({'access_token': str(new_token.access_token)}, status.HTTP_200_OK)
             else: 
                 return Response({"message": _("Token muddati o'tib ketgan")})
         else:
