@@ -52,24 +52,10 @@ class LoginView(generics.GenericAPIView):
 class LogOutView(APIView):
     permission_classes = [IsAuthenticated]
     def post(self, request):
-        try:
-            auth_header = request.headers.get('X-Refresh-Token')
-            print(auth_header)
-            if not auth_header or not auth_header.startswith('Bearer '):
-                return Response({'error': _("Noto'g'ri token1")}, status=status.HTTP_401_UNAUTHORIZED)
-            refresh_token = auth_header.split(' ')[1]
-            print()
-            print(refresh_token)
-            token = RefreshToken(refresh_token)
-            print(token)
-            token.verify()
-            token.blacklist()
-            response = Response({'message':_("Tizimdan chiqish muvaffaqiyatli amalga oshirildi")})
-            response.delete_cookie('refresh_token', samesite='Strict', secure=True)
-            request.session.flush()
-            return response
-        except (InvalidToken, TokenError):
-            return Response({"error": "Noto'g'ri token"}, status=status.HTTP_401_UNAUTHORIZED)
+        response = Response({'message':_("Tizimdan chiqish muvaffaqiyatli amalga oshirildi")})
+        response.delete_cookie('refresh_token')
+        request.session.flush()
+        return response
 
 class RegistrationView(generics.CreateAPIView):
     queryset = User.objects.all()
