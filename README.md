@@ -66,7 +66,7 @@ docker-compose up -d
 Swagger orqali API hujjatlarini ko‘rish uchun:
 
 ```
-http://127.0.0.1:8000/swagger/
+http://127.0.0.1:8000/docs/
 ```
 
 ## 🤝 Hissa qo‘shish
@@ -78,7 +78,7 @@ Agar loyihaga hissa qo‘shmoqchi bo‘lsangiz:
 
 ## 📞 Aloqa
 Agar savollaringiz bo‘lsa, quyidagi manzil orqali bog‘laning:
-📧 **Email:** your-email@example.com
+📧 **Email:** abduboriyabdusamadov66@gmail.com
 
 ---
 🛍️ **54-dokon** - e-commerce dunyosiga xush kelibsiz!
