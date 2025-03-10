@@ -1,21 +1,23 @@
 from user.models import User, UsersPassword
-from rest_framework import generics
 from user import serializers
+
+from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from django.utils.timezone import now
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.exceptions import AuthenticationFailed
-from django.utils.translation import gettext_lazy as _
 from rest_framework.views import APIView
+
+from django.utils.timezone import now
+from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import login
 from django.contrib.auth.hashers import check_password
-import jwt
+
 from datetime import datetime
 from config.settings import SECRET_KEY
 from datetime import timedelta
-from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
+import jwt
 
 def response_token_cookie(user, message):
     refresh_token = RefreshToken.for_user(user)
@@ -61,7 +63,30 @@ class RegistrationView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class =serializers.RegistrationSerializer
 
-    def post(self, request):
+    def post(self, request, *args, **kwargs):
+
+        """
+        Ro'yxatdan o'tish va tizimga kirish
+        ---
+        # Parameters
+        None
+        
+        # Example
+        {
+            "first_name": "John",
+            "last_name": "Doe",
+            "username": "johndoe",
+            "email": "johndoe@example.com",
+            "phone": "+998901234567",
+            "password": "12345678"
+        }
+        # Response
+        {
+            "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjI3MjM2NjQ3LCJpYXQiOjE2MjcxNTA2NDcsImp0aSI6IjIwZjg2ZjRhMTQ3YjRmMjk2ZmM2NmU2YjY4NWVlODk5IiwidXNlcl9pZCI6MX0._V3f4gZ7JtQXb2hT9hVTLv4vUO9yUk6XN2XfJjZl3Qs"
+        }
+        # Status
+        201 Created
+        """
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
@@ -96,24 +121,6 @@ class MeView(generics.RetrieveAPIView):
 
     def get_object(self):
         return self.request.user    
-
-class RefreshTokenView(generics.CreateAPIView):
-    serializer_class = serializers.RefreshTokenSerializer
-
-    def post(self, request, *args, **kwargs):
-        token = request.data.get('refresh_token')
-        if token:
-            payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
-            exp_time = datetime.fromtimestamp(payload['exp']) # 'exp': 1732280262, 1970-yil 1-yanvar 00:00:00 UTC dan boshlab soniyalarda hisoblangan vaqtni ko'rsatadi.
-            if exp_time > datetime.now() - timedelta(days=10):
-                token = RefreshToken(token)
-                token.blacklist()
-                new_token = RefreshToken.for_user(request.user)
-                return Response({'access_token': str(new_token.access_token)}, status.HTTP_200_OK)
-            else: 
-                return Response({"message": _("Token muddati o'tib ketgan")})
-        else:
-            return Response({"message": _("refresh_token mavjud emas")}) 
         
 class UsernamePasswordEditView(generics.GenericAPIView):
     serializer_class = serializers.UsernamePasswordSerializer

@@ -1,10 +1,12 @@
 from user.models import User
+
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
+
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError as DjangoValidationError
-from rest_framework_simplejwt.tokens import RefreshToken
+
 import re
 
 class ChangePasswordSerializer(serializers.ModelSerializer):
@@ -23,11 +25,6 @@ class ChangePasswordSerializer(serializers.ModelSerializer):
         else:
             return ({"message": _("Parollar bir hil emas!")})
 
-class RefreshTokenSerializer(serializers.ModelSerializer):
-    refresh_token = serializers.CharField()
-    class Meta:
-        model = User
-        fields = ['refresh_token']
 
 class LoginSerializer(serializers.ModelSerializer):
     class Meta:

@@ -1,10 +1,12 @@
-from rest_framework import generics
 from product import models
 from product import serializers
+
+from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
-from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework import status
+
+from django.shortcuts import get_object_or_404
 
 class ProductListView(generics.ListAPIView):
     queryset = models.Product.objects.order_by('?')
