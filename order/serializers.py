@@ -42,6 +42,12 @@ class BasketSerializer(serializers.ModelSerializer):
         fields = ["id", "user_id", "total_price"]
 
 
+class OrderItemCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BasketItem
+        fields = ['product', 'quantity', 'price']
+
+
 class OrderItemSerializer(serializers.ModelSerializer):
     product = serializers.CharField()
     class Meta:
@@ -64,9 +70,9 @@ class AddressSerializer(serializers.ModelSerializer):
         fields = ['longitude', 'latitude', 'location']
 
 class OrderSerializer(serializers.ModelSerializer):
-    order_item = OrderItemSerializer(many=True)
-    status = StatusSerializer(many=True)
-    address = AddressSerializer(many=True)
+    # order_item = OrderItemSerializer(many=True)
+    status = StatusSerializer()
+    address = AddressSerializer()
     class Meta:
         model = Order
         fields = [
@@ -76,17 +82,16 @@ class OrderSerializer(serializers.ModelSerializer):
             'total_price',
             'created_at',
             'updated_at',
-            'order_item',
         ]
     
 
 class OrderCreateSerializer(serializers.ModelSerializer):
-    # order_item = OrderItemCreateSerializer(many=True)
+    order_item = OrderItemCreateSerializer(many=True)
     address = AddressSerializer(many=True)
     class Meta:
         model = Order
         fields = [
-            # 'order_item',
+            'order_item',
             'address'
         ]
 

@@ -10,13 +10,9 @@ class Category(models.Model):
     slug = models.SlugField()
     image = models.ImageField(upload_to='category/')
     name = models.CharField(max_length=255)
-    subcategory = TreeForeignKey('self', on_delete=models.CASCADE, related_name='subcategories')
+    subcategory = models.ForeignKey('self', on_delete=models.CASCADE, related_name='subcategories', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
-    
-    class MPTTModel:
-        order_insertion_by = ['name']
         
 
     def save(self, *args, **kwargs):
@@ -48,7 +44,7 @@ class Product(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def clean(self) -> None:
-        if not (1 <= self.rebate <= 100):
+        if not (0 <= self.rebate <= 100):
             raise ValidationError(_("Ushbu maydon 1 dan 100 gacha qiymatlarni qabul qiladi!"))
         
     def save(self, *args, **kwargs):
