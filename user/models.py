@@ -21,7 +21,7 @@ class User(AbstractUser):
 
 
 class UsersPassword(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='users_password')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='passwords')
     password = models.PositiveBigIntegerField()
     time = models.DateTimeField(auto_now_add=True)
 

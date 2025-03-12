@@ -2,15 +2,10 @@ from order import models, serializers
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 
+# class OrderItemSerializer()
 
-class OrderListView(generics.ListAPIView):
-    serializer_class = serializers.OrderSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        return models.Order.objects.filter(user=self.request.user) 
     
-class OrderGetView(generics.RetrieveAPIView):
+class OrderGetView(generics.GenericAPIView):
     serializer_class = serializers.OrderSerializer
     permission_classes = [IsAuthenticated]
 
@@ -23,14 +18,11 @@ class OrderCreateView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
         
     
-class BasketListView(generics.ListAPIView):
+class BasketGetView(generics.GenericAPIView):
     serializer_class = serializers.BasketSerializer
 
     def get_queryset(self):
         return models.Basket.objects.filter(user=self.request.user)
 
-class BasketCreateView(generics.CreateAPIView):
-    queryset = models.Basket.objects.all()
-    serializer_class = serializers.BasketCreateSerializer
 
     

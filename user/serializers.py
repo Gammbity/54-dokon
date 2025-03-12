@@ -1,4 +1,5 @@
 from user.models import User
+from order.models import Basket
 
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -75,6 +76,9 @@ class RegistrationSerializer(serializers.Serializer):
             last_name=validated_data['last_name'],
             phone=validated_data['phone'],
             username=validated_data['username']
+        )
+        Basket.objects.create(
+            user_id = user.id
         )
         return user
     

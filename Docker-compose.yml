@@ -1,5 +1,7 @@
 services:
   web:
+    container_name: 54-dokon
+    image: 54-dokon-image
     build: ./
     volumes:
       - ./:/app

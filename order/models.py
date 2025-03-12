@@ -5,13 +5,18 @@ from django.utils.translation import gettext_lazy as _
 
 
 class Basket(models.Model):
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_basket")
-    total_price = models.PositiveIntegerField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="baskets")
+    total_price = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self) -> str:
         return f"{self.user.get_full_name()} - {self.id}"
+    
+    def clean(self):
+        self.items.all().delete()
+        self.total_price = 0
+        self.save()
 
     class Meta:
         verbose_name = _("savat")
@@ -19,17 +24,16 @@ class Basket(models.Model):
         ordering = ['-created_at']
 
 class Status(models.Model):
-    status = models.CharField(max_length=20, choices=[
-        ("pending", "kutishda"),
-        ("shipped", "jo'natilgan"),
-        ("delivered", "yetkazib berildi"),
-        ("cancelled", "bekor qilingan")
-    ], default="pending")
+    status = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return 
+        return self.status
+    
+    class Meta:
+        verbose_name = _("Holat")
+        verbose_name_plural = _("Holatlar")
 
 class Address(models.Model):
     longitude = models.DecimalField(max_digits=9, decimal_places=6)
@@ -46,10 +50,9 @@ class Address(models.Model):
         verbose_name_plural = _("Manzillar")
 
 class Order(models.Model):
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_order')
-    status_id = models.ForeignKey(Status, on_delete=models.CASCADE, related_name='status_order')
-    basket_id = models.ForeignKey(Basket, on_delete=models.CASCADE, related_name='basket_order')
-    address_id = models.ForeignKey(Address, on_delete=models.CASCADE, related_name='address_order')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
+    status = models.ForeignKey(Status, on_delete=models.CASCADE, related_name='order_with_status')
+    address = models.ForeignKey(Address, on_delete=models.CASCADE, related_name='order_at_address')
     total_price = models.PositiveBigIntegerField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -64,8 +67,8 @@ class Order(models.Model):
 
 
 class OrderItem(models.Model):
-    product_id = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_order_item')
-    order_id = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_order_item')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='items')
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='item')
     price = models.BigIntegerField()
     quantity = models.BigIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
@@ -82,8 +85,8 @@ class OrderItem(models.Model):
 
 
 class BasketItem(models.Model):
-    basket_id = models.ForeignKey(Basket, on_delete=models.CASCADE, related_name='basket_basket_item')
-    product_id = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_basket_item')
+    basket = models.ForeignKey(Basket, on_delete=models.CASCADE, related_name='items')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='item')
     quantity = models.PositiveIntegerField(default=1)
     price = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
@@ -91,7 +94,7 @@ class BasketItem(models.Model):
 
 
     def __str__(self):
-        return f"{self.basket_id.user.get_full_name()} - {self.basket_id}"
+        return f"{self.basket.user.get_full_name()} - {self.basket}"
     
     class Meta:
         verbose_name = _("Savat elementi")

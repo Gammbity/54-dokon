@@ -4,13 +4,20 @@ from ckeditor_uploader.fields import RichTextUploadingField
 from django.core.exceptions import ValidationError
 from user.models import User
 from django.utils.text import slugify
+from mptt.models import MPTTModel, TreeForeignKey
 
 class Category(models.Model):
     slug = models.SlugField()
     image = models.ImageField(upload_to='category/')
     name = models.CharField(max_length=255)
+    subcategory = TreeForeignKey('self', on_delete=models.CASCADE, related_name='subcategories')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    
+    class MPTTModel:
+        order_insertion_by = ['name']
+        
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
