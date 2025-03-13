@@ -100,6 +100,7 @@ class OrderCreateSerializer(serializers.ModelSerializer):
         items_data = validated_data.pop('order_item')
         user = self.context['request'].user
         products = {}
+        basket = Basket.objects.get(user=user)
         try:
             for item_data in items_data:
                 product = Product.objects.get(name=item_data['product'])
@@ -118,7 +119,6 @@ class OrderCreateSerializer(serializers.ModelSerializer):
             order.total_price = total_price
             order.save()
             products.clear()
-            Basket.objects.get(user_id=user).clean()
         except Exception as e:
             raise serializers.ValidationError(str(e))
         return order

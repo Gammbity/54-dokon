@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 
 
 class Basket(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="baskets")
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="basket")
     total_price = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
