@@ -36,6 +36,7 @@ class Status(models.Model):
         verbose_name_plural = _("Holatlar")
 
 class Address(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='address')
     longitude = models.DecimalField(max_digits=9, decimal_places=6)
     latitude = models.DecimalField(max_digits=9, decimal_places=6)
     location = models.CharField(max_length=255)
@@ -51,7 +52,7 @@ class Address(models.Model):
 
 class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
-    status = models.ForeignKey(Status, on_delete=models.CASCADE, related_name='order_with_status')
+    status = models.ForeignKey(Status, on_delete=models.CASCADE, related_name='order_with_status', default=1)
     address = models.ForeignKey(Address, on_delete=models.CASCADE, related_name='order_at_address')
     total_price = models.PositiveBigIntegerField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)

@@ -46,7 +46,7 @@ class RegistrationSerializer(serializers.Serializer):
     username = serializers.CharField()
 
     def validate_phone(self, value):
-        pattern = r"^(?:\+998(33|88|97|99|91|93)\d{7})$"
+        pattern = r"^\+998(33|88|97|99|91|93|90|94|98|95|50|55|77|78)\d{7}$"
         if not re.match(pattern, value): 
             raise ValidationError(_(f"Ushbu {value} kantakt O'zbekistonga tegishli emas!"))
         return value
@@ -78,7 +78,7 @@ class RegistrationSerializer(serializers.Serializer):
             username=validated_data['username']
         )
         Basket.objects.create(
-            user_id = user.id
+            user = user
         )
         return user
     

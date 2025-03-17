@@ -1,6 +1,6 @@
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
-from order.models import Order
+from order.models import Order, BasketItem
 from bot.order_bot import bot_order, bot
 import asyncio
 
@@ -22,3 +22,11 @@ def order_save(sender, instance, created, **kwargs):
             loop.run_until_complete(bot_order(instance.user, bot))
         except Exception as e:
             print(f"Error in async execution: {e}")
+
+@receiver(pre_save, sender=BasketItem)
+def price_calc(sender, instance, **kwargs):
+    try:
+        instance.price = instance.product.price * instance.quantity
+        return instance
+    except Exception as e:
+        raise e

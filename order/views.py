@@ -13,6 +13,9 @@ class OrderGetView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
+        basket = models.Basket.objects.get(user=self.request.user)
+        basket_items = basket.items.filter(basket=basket)
+        print(basket_items)
         return models.Order.objects.filter(user=self.request.user) 
     
 class OrderCreateView(generics.CreateAPIView):

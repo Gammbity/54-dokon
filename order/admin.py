@@ -11,11 +11,13 @@ class OrderAdmin(admin.ModelAdmin):
 class BasketItemAdmin(admin.ModelAdmin):
     list_display = ['id']
     list_display_link = ['id']
+    readonly_fields = ['price']
 
 @admin.register(Basket)
 class BasketAdmin(admin.ModelAdmin):
     list_display = ['user', 'id']
     list_display_link = ['user']
+    readonly_fields = ['total_price']
 
 @admin.register(Address)
 class AddressAdmin(admin.ModelAdmin):
