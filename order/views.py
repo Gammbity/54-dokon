@@ -4,6 +4,12 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.utils.translation import gettext_lazy as _
 
+class AddressListView(generics.ListAPIView):
+    serializer_class = serializers.AddressSerializer
+
+    def get_queryset(self):
+        return models.Address.objects.filter(user=self.request.user)
+
 class BasketItemCreateView(generics.CreateAPIView):
     serializer_class = serializers.BasketItemCreateSerializer
     queryset = models.BasketItem

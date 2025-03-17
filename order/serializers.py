@@ -96,10 +96,7 @@ class OrderCreateSerializer(serializers.ModelSerializer):
     address = AddressSerializer(required=False, allow_null=True)
     class Meta:
         model = Order
-        fields = [
-            'existing_addresses',
-            'address'
-        ]
+        fields = ['existing_addresses', 'address']
 
     def get_fields(self):
         fields = super().get_fields()
@@ -110,18 +107,19 @@ class OrderCreateSerializer(serializers.ModelSerializer):
         return fields
 
     def validate(self, data):
-        existing_addresses = data.pop('existing_addresses')
-        address = data.pop('address')
+        existing_addresses = data.pop('existing_addresses', None)
+        address = data.pop('address', None)
+
         if not existing_addresses and not address:
             raise serializers.ValidationError({"address": _("Joylashuv kiritilishi kerak!")})
-        elif address and address['location']:
+        
+        if address and address['location']:
             new_address = Address.objects.create(
                 user=self.context['request'].user, **address 
             ) 
-            data['id'] = new_address.id
+            data['address'] = new_address
         else:
-            existing_addresse = Address.objects.filter(location=existing_addresses).first()
-            data['id'] = existing_addresse.id
+            data['address'] = existing_addresses
         return data
     
     def create(self, validated_data):
