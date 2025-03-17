@@ -16,6 +16,6 @@ if __name__ == "__main__":
 async def bot_order(order_user, bot):
     try:
         for i in tg_id:
-            await bot.send_message(i, f"Order User: {order_user}")
+            await bot.send_message(i, f"Ordered-By: {order_user}")
     except Exception as e:
         print(f"Error sending telegram message: {e}")

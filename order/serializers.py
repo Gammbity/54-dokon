@@ -153,6 +153,7 @@ class OrderCreateSerializer(serializers.ModelSerializer):
             order.total_price = total_price
             order.save()
             products.clear()
+            basket.clean()
         except Exception as e:
             raise serializers.ValidationError(str(e))
         return order
