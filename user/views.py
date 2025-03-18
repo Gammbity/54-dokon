@@ -11,8 +11,8 @@ from rest_framework.views import APIView
 
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
-from django.contrib.auth import login
-from django.contrib.auth.hashers import check_password
+from django.contrib.auth import login, authenticate
+from django.contrib.auth.hashers import check_password, make_password
 
 from datetime import datetime
 from config.settings import SECRET_KEY
@@ -96,14 +96,13 @@ class RegistrationView(generics.CreateAPIView):
             return response
         else: raise AuthenticationFailed(status.HTTP_400_BAD_REQUEST)  
         
-    
 class LoginWithBotView(generics.GenericAPIView):
     serializer_class = serializers.RegistrationBotSerializer
     
     def post(self, request, *args, **kwargs):
         if request.data['password']:
             password = int(request.data['password'])
-            generatepassword = UsersPassword.objects.get(password=password)
+            generatepassword = UsersPassword.objects.filter(password=password).first()
             if generatepassword:
                 time_diff = int((now() - generatepassword.time).total_seconds())
                 if time_diff <= 10000:
@@ -136,11 +135,15 @@ class UsernamePasswordEditView(generics.GenericAPIView):
 
     def post(self, request, *args, **kwargs):
         user = User.objects.get(id=request.user.id)
-        username = request['username']
-        password = request['password']
-        if username and password:
+        password = request.data.get('password')
+        username = request.data.get('username')
+        new_password = request.data.get('new_password')
+        user = authenticate(username=username, password=password)
+        if not user:
+            raise serializers.ValidationError(_("Username yoki Parol xato!"))
+        if username and new_password:
             user.username = username
-            user.password = password
+            user.password = make_password(new_password)
             user.save()
             return Response(status=status.HTTP_200_OK)
         else:

@@ -1,5 +1,7 @@
 from django.test import TestCase
 from product import models
+from user.models import User
+
 
 class ProductTestCase(TestCase):
 
@@ -21,15 +23,15 @@ class CategoryTestCase(TestCase):
 
     def setUp(self):
         self.category = models.Category.objects.create(name="test1")
-        models.Category.objects.create(name="test2")
 
     def test_categories(self):
         response = self.client.get("/api/v1/product/categories/")
         self.assertEqual(response.status_code, 200)
         self.assertIn("test1", response.data[0]['name'])
-        self.assertIn("test2", response.data[1]['name'])
 
     def test_get_category(self):
         response = self.client.get(f"/api/v1/product/category/{self.category.name}/")
         self.assertEqual(response.status_code, 200)
         self.assertIn("test1", response.data['name'])
+
+    

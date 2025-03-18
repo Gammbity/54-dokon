@@ -8,6 +8,16 @@ from rest_framework import status
 
 from django.shortcuts import get_object_or_404
 
+
+# class CommentListView(generics.ListAPIView):
+#     queryset = models.Comment.objects.all()
+#     serializer_class = serializers.CommentSerializer
+
+# class CommentGetView(generics.RetrieveAPIView):
+#     queryset = models.Comment.objects.all()
+#     serializer_class = serializers.CommentSerializer
+#     lookup_field = ['slug']
+
 class ProductListView(generics.ListAPIView):
     queryset = models.Product.objects.order_by('?')
     serializer_class = serializers.ProductSerializer
@@ -26,15 +36,15 @@ class CategoryView(generics.RetrieveAPIView):
     serializer_class = serializers.CategorySerializer
     lookup_field = 'slug'
 
-class CommentCreateView(generics.CreateAPIView):
-    serializer_class = serializers.CommentCreateSerializer
-    queryset = models.Comment.objects.all()
-    permission_classes = [IsAuthenticated]
+# class CommentCreateView(generics.CreateAPIView):
+#     serializer_class = serializers.CommentCreateSerializer
+#     queryset = models.Comment.objects.all()
+#     permission_classes = [IsAuthenticated]
 
-class CommentDelView(generics.DestroyAPIView):
-    serializer_class = serializers.CommentDelSerializer
+# class CommentDelView(generics.DestroyAPIView):
+#     serializer_class = serializers.CommentDelSerializer
     
-    def delete(self, request, *args, **kwargs):
-        comment = get_object_or_404(models.Comment, pk=kwargs['pk'], user=request.user)
-        comment.delete()
-        return Response({"message", "Izoh muvaffaqiyatli o'chirildi"}, status.HTTP_204_NO_CONTENT)
+#     def delete(self, request, *args, **kwargs):
+#         comment = get_object_or_404(models.Comment, pk=kwargs['pk'], user=request.user)
+#         comment.delete()
+#         return Response({"message", "Izoh muvaffaqiyatli o'chirildi"}, status.HTTP_204_NO_CONTENT)

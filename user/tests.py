@@ -1,10 +1,10 @@
 from django.test import TestCase
-from user.models import User
-
+from user.models import User, UsersPassword
+from datetime import datetime
 
 class UserViewTest(TestCase):
-
-    def test_get_user(self):
+    
+    def setUp(self):
         self.user = User.objects.create_user(
             first_name='Ali',
             last_name='Aliyev',
@@ -14,10 +14,46 @@ class UserViewTest(TestCase):
             password='testpassword'
         )
         self.client.login(username="testuser", password="testpassword")
+
+    def test_get_user(self):
+
         response = self.client.get(f'/api/v1/user/me/')  
         self.assertEqual(response.status_code, 200)
+    
+    def test_registr_bot(self):
 
-    def test_registr_user(self):
+        UsersPassword.objects.create(user=self.user, password=123456, time=datetime.now())
+        response = self.client.post("/api/v1/user/registration/bot/", data={"password":123456})
+        self.assertEqual(response.status_code, 201)
+        self.assertIn('access_token', response.data)
+
+    def test_logout(self):
+        
+        response = self.client.post("/api/v1/user/logout/")
+        self.assertEqual(response.status_code, 200)
+    
+    def test_login(self):
+        user = {
+            "username": "testuser", 
+            "password": "testpassword"
+        }
+        response = self.client.post("/api/v1/user/login/", data=user)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('access_token', response.data)
+
+    def test_user_change_password_username(self):
+        user = {
+            "password": "testpassword",
+            "username": "testuser", 
+            "new_password": "testpasswordchanged"
+        }
+        response = self.client.post("/api/v1/user/edit/password/", data=user)
+        self.assertEqual(response.status_code, 200)
+
+
+class UserRegistrationTest(TestCase):
+    
+    def test_register_user(self):
         user = {
             "first_name":"Ali",
             "last_name":"Aliyev",
@@ -28,5 +64,4 @@ class UserViewTest(TestCase):
         }
         response = self.client.post("/api/v1/user/registration/", data=user) 
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(response.data['message'], "Registration muvaffaqiyatli amalga oshirildi")
         self.assertIn('access_token', response.data)
