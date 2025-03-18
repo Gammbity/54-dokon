@@ -137,7 +137,7 @@ class OrderCreateSerializer(serializers.ModelSerializer):
                 products[item_data.product] = product
                 if item_data.quantity > product.count:
                     raise serializers.ValidationError(_("Ushbu mahsulotlar soni yetarli emas!"))
-            address = Address.objects.get(id=validated_data['id'])
+            address = Address.objects.get(id=validated_data['address'].id)
             user = User.objects.get(username=user)
             order = Order.objects.create(user=user, address=address)
             total_price = 0
