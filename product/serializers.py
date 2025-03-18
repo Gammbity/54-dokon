@@ -1,5 +1,37 @@
 from rest_framework import serializers
 from product import models
+from django.utils.translation import gettext_lazy as _
+class ProductCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Product
+        fields = [
+            'name',
+            'real_price',
+            'price',
+            'description',
+            'count',
+            'category',
+            'rebate',
+            'is_new',
+        ]
+
+        def validate(self, data):
+            product = models.Product.objects.filter(name=data.name).exists()
+            if product:
+                raise serializers.ValidationError(_("Ushbu mahsolat allaqachon yaratib bo'lingan"))
+            return data
+
+        def create(self, validated_data):
+            pass
+
+class CategoryCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Category
+        fields = [
+            'image',
+            'name',
+            'subcategory',
+        ]
 
 class CommentDelSerializer(serializers.ModelSerializer):
     class Meta:

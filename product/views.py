@@ -2,7 +2,7 @@ from product import models
 from product import serializers
 
 from rest_framework import generics
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -17,6 +17,16 @@ from django.shortcuts import get_object_or_404
 #     queryset = models.Comment.objects.all()
 #     serializer_class = serializers.CommentSerializer
 #     lookup_field = ['slug']
+
+class ProductCreateView(generics.CreateAPIView):
+    queryset = models.Product.objects.all()
+    serializer_class = serializers.ProductCreateSerializer
+    permission_classes = [IsAdminUser]
+
+class CategoryCreateView(generics.CreateAPIView):
+    queryset = models.Category.objects.all()
+    serializer_class = serializers.CategoryCreateSerializer
+    permission_classes = [IsAdminUser]
 
 class ProductListView(generics.ListAPIView):
     queryset = models.Product.objects.order_by('?')

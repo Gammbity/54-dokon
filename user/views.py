@@ -54,10 +54,18 @@ class LoginView(generics.GenericAPIView):
 class LogOutView(APIView):
     permission_classes = [IsAuthenticated]
     def post(self, request):
-        response = Response({'message':_("Tizimdan chiqish muvaffaqiyatli amalga oshirildi")})
-        response.delete_cookie('refresh_token')
-        request.session.flush()
-        return response
+        try:
+            refresh_token = request.COOKIES.get('refresh_token')
+            if refresh_token:
+                token = RefreshToken(refresh_token)
+                token.blacklist() 
+
+            response = Response({'message': _("Tizimdan chiqish muvaffaqiyatli amalga oshirildi")})
+            response.delete_cookie('refresh_token')
+            request.session.flush()
+            return response
+        except Exception as e:
+            return Response({"error": str(e)}, status=400)
 
 class RegistrationView(generics.CreateAPIView):
     queryset = User.objects.all()
