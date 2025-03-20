@@ -1,10 +1,12 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from ckeditor_uploader.fields import RichTextUploadingField
 from django.core.exceptions import ValidationError
-from user.models import User
 from django.utils.text import slugify
-from mptt.models import MPTTModel, TreeForeignKey
+
+from ckeditor_uploader.fields import RichTextUploadingField
+
+from user.models import User
+
 
 class Category(models.Model):
     slug = models.SlugField()
@@ -18,6 +20,10 @@ class Category(models.Model):
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
         super().save(*args, **kwargs)
+    
+    def clean(self):
+        if self.subcategory and self.subcategory == self:
+            raise ValidationError(_("Kategoriya o'zini ota-kategoriya sifatida tanlay olmaydi."))
 
     def __str__(self) -> str:
         return self.name

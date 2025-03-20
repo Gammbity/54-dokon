@@ -7,17 +7,24 @@ class OrderAdmin(admin.ModelAdmin):
     list_display_links = ['user']
     readonly_fields = ['total_price']
 
+    def has_add_permission(self, request):
+        return False
+
 @admin.register(BasketItem)
 class BasketItemAdmin(admin.ModelAdmin):
     list_display = ['id']
     list_display_link = ['id']
     readonly_fields = ['price']
 
+
 @admin.register(Basket)
 class BasketAdmin(admin.ModelAdmin):
     list_display = ['user', 'id']
     list_display_link = ['user']
     readonly_fields = ['total_price']
+
+    def has_add_permission(self, request):
+        return False
 
 @admin.register(Address)
 class AddressAdmin(admin.ModelAdmin):

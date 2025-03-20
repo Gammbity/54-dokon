@@ -1,32 +1,14 @@
-from product import models
-from product import serializers
+from django.shortcuts import get_object_or_404
 
-from rest_framework import generics
+from rest_framework import generics, viewsets
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework import status
 
-from django.shortcuts import get_object_or_404
+from product import models
+from product import serializers
 
 
-# class CommentListView(generics.ListAPIView):
-#     queryset = models.Comment.objects.all()
-#     serializer_class = serializers.CommentSerializer
-
-# class CommentGetView(generics.RetrieveAPIView):
-#     queryset = models.Comment.objects.all()
-#     serializer_class = serializers.CommentSerializer
-#     lookup_field = ['slug']
-
-class ProductCreateView(generics.CreateAPIView):
-    queryset = models.Product.objects.all()
-    serializer_class = serializers.ProductCreateSerializer
-    permission_classes = [IsAdminUser]
-
-class CategoryCreateView(generics.CreateAPIView):
-    queryset = models.Category.objects.all()
-    serializer_class = serializers.CategoryCreateSerializer
-    permission_classes = [IsAdminUser]
 
 class ProductListView(generics.ListAPIView):
     queryset = models.Product.objects.order_by('?')
@@ -58,3 +40,25 @@ class CategoryView(generics.RetrieveAPIView):
 #         comment = get_object_or_404(models.Comment, pk=kwargs['pk'], user=request.user)
 #         comment.delete()
 #         return Response({"message", "Izoh muvaffaqiyatli o'chirildi"}, status.HTTP_204_NO_CONTENT)
+
+# class CommentListView(generics.ListAPIView):
+#     queryset = models.Comment.objects.all()
+#     serializer_class = serializers.CommentSerializer
+
+# class CommentGetView(generics.RetrieveAPIView):
+#     queryset = models.Comment.objects.all()
+#     serializer_class = serializers.CommentSerializer
+#     lookup_field = ['slug']
+
+
+
+# ADMIN ----------------------------------------------------------------
+
+
+class AdminProductView(viewsets.ModelViewSet):
+    queryset = models.Product.objects.all()
+    serializer_class = serializers.AdminProductSerializer
+
+class AdminCategoryView(viewsets.ModelViewSet):
+    queryset = models.Category.objects.all()
+    serializer_class = serializers.AdminCategorySerializer

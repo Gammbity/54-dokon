@@ -28,8 +28,8 @@ urlpatterns = [
    path('', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
    path('admin/', admin.site.urls),
    path('ckeditor/', include('ckeditor_uploader.urls')),
-   path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'), 
-   path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'), 
+   path('api/v1/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'), 
+   path('api/v1/token/verify/', TokenVerifyView.as_view(), name='token_verify'), 
    #app
    path('api/v1/user/', include('user.urls')),
    path('api/v1/product/', include('product.urls')),
