@@ -10,22 +10,16 @@ from django.core.exceptions import ValidationError as DjangoValidationError
 
 import re
 
-class ChangePasswordSerializer(serializers.ModelSerializer):
-    new_password = serializers.CharField()
-    new_password_again = serializers.CharField()
-    class Meta:
-        model = User
-        fields = ['password', 'new_password', 'new_password_again']
-
-    def validate_new_password(self, data):
-        if data == self.new_password_again:
-            try:
-                validate_password(data)
-            except DjangoValidationError as e:
-                raise ({"error": e})
-        else:
-            return ({"message": _("Parollar bir hil emas!")})
-
+def custom_validate_password(data):
+    try:
+        validate_password(data)
+    except DjangoValidationError as e:
+        raise ValidationError(
+            {
+                'password': e.messages
+            }
+        )
+    return data
 
 class LoginSerializer(serializers.ModelSerializer):
     class Meta:
@@ -58,15 +52,7 @@ class RegistrationSerializer(serializers.Serializer):
         return value
     
     def validate_password(self, data):
-        try:
-            validate_password(data)
-        except DjangoValidationError as e:
-            raise ValidationError(
-                {
-                    'password': e.messages
-                }
-            )
-        return data
+        return custom_validate_password(data)
     
     def create(self, validated_data):
         user = User.objects.create_user(
@@ -88,6 +74,13 @@ class RegistrationBotSerializer(serializers.ModelSerializer):
         fields = ['password']
 
 class UsernamePasswordSerializer(serializers.ModelSerializer):
+    password1 = serializers.CharField(write_only=True)  
+    username = serializers.CharField(allow_null=True)
     class Meta:
         model = User
-        fields = ['username', 'password']
+        fields = ['password' ,'username', 'password1'] 
+
+    def validate_password1(self, value):
+        print(f"Validating password1: {value}")  
+        return custom_validate_password(value)
+        

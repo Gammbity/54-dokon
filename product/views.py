@@ -58,7 +58,9 @@ class CategoryView(generics.RetrieveAPIView):
 class AdminProductView(viewsets.ModelViewSet):
     queryset = models.Product.objects.all()
     serializer_class = serializers.AdminProductSerializer
+    lookup_field = 'name'
 
 class AdminCategoryView(viewsets.ModelViewSet):
     queryset = models.Category.objects.all()
     serializer_class = serializers.AdminCategorySerializer
+    lookup_field = 'name'

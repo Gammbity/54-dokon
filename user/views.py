@@ -1,5 +1,6 @@
 from user.models import User, UsersPassword
 from user import serializers
+from config.settings import SECRET_KEY
 
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
@@ -130,6 +131,7 @@ class MeView(generics.RetrieveAPIView):
         return self.request.user    
         
 class UsernamePasswordEditView(generics.GenericAPIView):
+    queryset = User.objects.all()
     serializer_class = serializers.UsernamePasswordSerializer
     permission_classes = [IsAuthenticated]
 
@@ -143,27 +145,17 @@ class UsernamePasswordEditView(generics.GenericAPIView):
 
     def post(self, request, *args, **kwargs):
         user = User.objects.get(id=request.user.id)
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
         password = request.data.get('password')
         username = request.data.get('username')
-        new_password = request.data.get('new_password')
-        user = authenticate(username=username, password=password)
-        if not user:
-            raise serializers.ValidationError(_("Username yoki Parol xato!"))
-        if username and new_password:
-            user.username = username
-            user.password = make_password(new_password)
-            user.save()
-            return Response(status=status.HTTP_200_OK)
-        else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-
-class ChangePasswordView(generics.GenericAPIView):
-    serializer_class = serializers.ChangePasswordSerializer
-
-    def post(self, request, *args, **kwargs):
-        user_id = request.user.id
-        user = User.objects.get(id=user_id)
-        user.password = request['new_password']
+        new_password = serializer.validated_data.get('password1')
+        is_same = check_password(password, user.password)
+        if not is_same:
+            raise serializers.ValidationError(_("Parol xato!"))
+        user.username = username if username else user.username
+        user.password = make_password(new_password) if make_password(new_password) else password
         user.save()
-        return Response(status.HTTP_200_OK)
+        return Response(status=status.HTTP_200_OK)
+
     
