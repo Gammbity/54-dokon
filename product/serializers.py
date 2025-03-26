@@ -30,7 +30,7 @@ class CommentCreateSerializer(serializers.ModelSerializer):
         fields = ['text', 'product', 'degree']
 
 class ProductSerializer(serializers.ModelSerializer):
-    comment = CommentSerializer
+    comment = CommentSerializer()
     category = serializers.CharField()
     product_image = ProductImageSerializer(many=True, read_only=True)
     class Meta:
@@ -47,9 +47,10 @@ class CategorySerializer(serializers.ModelSerializer):
 # ADMIN -------------------------------------------------------------------------------
 
 class AdminProductSerializer(serializers.ModelSerializer):
-    comment = CommentSerializer
-    category = CategoriesSerializer
+    category = CategoriesSerializer()
     product_image = ProductImageSerializer(many=True, read_only=True)
+    comment = CommentSerializer(many=True, read_only=True)
+    with_rebate = serializers.IntegerField(read_only=True)
     class Meta:
         model = models.Product
         fields = ['name', "real_price", "price", 'with_rebate', 'description', 'category', 'count', 'views', 'likes', "rebate", 'product_image', "is_new", 'comment', 'created_at']
@@ -66,6 +67,8 @@ class AdminProductSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(_("Berilgan kategoriya mavjud emas."))
 
 class AdminCategorySerializer(serializers.ModelSerializer):
+    created_at = serializers.DateTimeField(read_only=True)
+    subcategory = CategoriesSerializer()
     class Meta:
         model = models.Category
         fields = [

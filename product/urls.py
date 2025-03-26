@@ -6,7 +6,7 @@ from product import views
 
 router = DefaultRouter()
 router.register(r'admin/products', views.AdminProductView, basename='product'),
-router.register(r'admin/category', views.AdminProductView, basename='category'),
+router.register(r'admin/category', views.AdminCategoryView, basename='category'),
 
 urlpatterns = [
     path("products/", views.ProductListView.as_view(), name="products"),
