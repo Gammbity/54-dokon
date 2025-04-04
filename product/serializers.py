@@ -30,7 +30,7 @@ class CommentCreateSerializer(serializers.ModelSerializer):
         fields = ['text', 'product', 'degree']
 
 class ProductSerializer(serializers.ModelSerializer):
-    comment = CommentSerializer()
+    comment = CommentSerializer(many=True)
     category = serializers.CharField()
     product_image = ProductImageSerializer(many=True, read_only=True)
     class Meta:
@@ -68,7 +68,7 @@ class AdminProductSerializer(serializers.ModelSerializer):
 
 class AdminCategorySerializer(serializers.ModelSerializer):
     created_at = serializers.DateTimeField(read_only=True)
-    subcategory = CategoriesSerializer()
+    subcategory = CategorySerializer(required=False)
     class Meta:
         model = models.Category
         fields = [
@@ -76,7 +76,8 @@ class AdminCategorySerializer(serializers.ModelSerializer):
             'name',
             'subcategory',
             'created_at',
-        ]
+        ] 
+        read_only_fields = ['slug']
 
     def validate_name(self, value):
         category = models.Category.objects.filter(name=value).exists()

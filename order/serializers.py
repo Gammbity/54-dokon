@@ -106,52 +106,39 @@ class OrderCreateSerializer(serializers.ModelSerializer):
             fields['existing_addresses'].queryset = Address.objects.filter(user=request.user)
         return fields
 
+class OrderSerializer(serializers.Serializer):
+    existing_addresses = serializers.PrimaryKeyRelatedField(
+        queryset=Address.objects.all(), required=False, allow_null=True
+    )
+    address = serializers.JSONField(required=False, allow_null=True)
+
     def validate(self, data):
-        existing_addresses = data.pop('existing_addresses', None)
-        address = data.pop('address', None)
+        user = self.context["request"].user
+
+        existing_addresses = data.get("existing_addresses")
+        address = data.get("address")
 
         if not existing_addresses and not address:
             raise serializers.ValidationError({"address": _("Joylashuv kiritilishi kerak!")})
-        
-        if address and address['location']:
-            new_address = Address.objects.create(
-                user=self.context['request'].user, **address 
-            ) 
-            data['address'] = new_address
-        else:
-            data['address'] = existing_addresses
-        return data
-    
-    def create(self, validated_data):
-        user = self.context['request'].user
-        products = {}
-        basket = Basket.objects.filter(user=user).first()
+
+        if address:
+            if not isinstance(address, dict) or "location" not in address:
+                raise serializers.ValidationError({"address": _("Manzil noto‘g‘ri formatda!")})
+
+        data["address"] = existing_addresses or address
+
+        basket = Basket.objects.filter(user=user).prefetch_related("items__product").first()
         if not basket:
-            raise serializers.ValidationError({"basket":_("Savatcha hali mavjud emas!")})
-        basket_items = basket.items.filter(basket=basket).all()     
+            raise serializers.ValidationError({"basket": _("Savatcha hali mavjud emas!")})
+
+        basket_items = basket.items.all()
         if not basket_items:
-            raise serializers.ValidationError({"basket_items":_("Savatcha elementlari hali mavjud emas!")})
-        try:
-            for item_data in basket_items:
-                product = Product.objects.get(name=item_data.product)
-                products[item_data.product] = product
-                if item_data.quantity > product.count:
-                    raise serializers.ValidationError(_("Ushbu mahsulotlar soni yetarli emas!"))
-            address = Address.objects.get(id=validated_data['address'].id)
-            user = User.objects.get(username=user)
-            order = Order.objects.create(user=user, address=address)
-            total_price = 0
-            for item_data in basket_items:
-                product = products[item_data.product]
-                item_data.price = product.price * item_data.quantity
-                total_price += item_data.price 
-                product.count -= item_data.quantity
-                product.save()
-                OrderItem.objects.create(order=order, product=product, price=item_data.price, quantity=item_data.quantity)
-            order.total_price = total_price
-            order.save()
-            products.clear()
-            basket.clean()
-        except Exception as e:
-            raise serializers.ValidationError(str(e))
-        return order
+            raise serializers.ValidationError({"basket_items": _("Savatcha elementlari hali mavjud emas!")})
+
+        for item in basket_items:
+            if item.quantity > item.product.count:
+                raise serializers.ValidationError({f"product_{item.product.id}": _("Ushbu mahsulotlar soni yetarli emas!")})
+
+        return data
+
+    

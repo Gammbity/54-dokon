@@ -10,14 +10,14 @@ from user.models import User
 
 class Category(models.Model):
     slug = models.SlugField()
-    image = models.ImageField(upload_to='category/')
+    image = models.ImageField(upload_to='category/', null=True, blank=True)
     name = models.CharField(max_length=255)
     subcategory = models.ForeignKey('self', on_delete=models.CASCADE, related_name='subcategories', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
         
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs):    
         self.slug = slugify(self.name)
         super().save(*args, **kwargs)
     

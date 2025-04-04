@@ -27,6 +27,35 @@ class OrderCreateView(generics.CreateAPIView):
     queryset = models.Order.objects.all()
     serializer_class = serializers.OrderCreateSerializer
     permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        serializer = serializers.OrderSerializer(data=request.data, context={"request": request})
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        user = request.user
+        address = serializer.validated_data["address"]
+
+        basket = models.Basket.objects.filter(user=user).first()
+        basket_items = basket.items.all()
+
+        order = models.Order.objects.create(user=user, address=address)
+        total_price = 0
+
+        for item in basket_items:
+            product = item.product
+            item_price = product.price * item.quantity
+            total_price += item_price
+            product.count -= item.quantity
+            product.save()
+            models.OrderItem.objects.create(order=order, product=product, price=item_price, quantity=item.quantity)
+
+        order.total_price = total_price
+        order.save()
+
+        basket.clean()
+
+        return Response({"message": _("Buyurtma yaratildi!"), "order_id": order.id}, status=status.HTTP_201_CREATED)
         
     
 class BasketGetView(generics.GenericAPIView):

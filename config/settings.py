@@ -46,8 +46,7 @@ INSTALLED_APPS = [
     'ckeditor',
     'corsheaders',
     'django_celery_results',
-    "debug_toolbar",
-
+    'debug_toolbar',
     #app
     'user',
     'product',

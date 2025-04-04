@@ -1,4 +1,5 @@
 from django.test import TestCase
+from django.urls import reverse
 
 from product import models
 from user.models import User
@@ -38,9 +39,9 @@ class CategoryTestCase(TestCase):
 
     def test_create_category(self):
         category = {
-            "image": "../../../../home/abduboriyxoja/Pictures/my.jpg",
             "name": "Electro",
         }
 
-        response = self.client.post("/api/v1/product/admin/category/create/", data=json.dumps(category), content_type="application/json")
-        print(response)
+        response = self.client.post(reverse("category-list"), json.dumps(category), content_type='application/json')
+        self.assertEqual(response.status_code, 201)
+        self.assertIn("Electro", response.data['name'])
