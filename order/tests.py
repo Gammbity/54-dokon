@@ -55,9 +55,8 @@ class OrderTestCase(TestCase):
             content_type="application/json"
         )
         self.assertEqual(response.status_code, 201)
-        response_data = response.json()
-        self.assertIn("address", response_data)
-        self.assertEqual(response_data["address"]["location"], "Tashkent")
+        self.assertEqual(response.data["message"], "Buyurtma yaratildi!")
+        self.assertEqual(response.data['order_id'], 1)
 
     def test_list_orders(self):
         models.Order.objects.create(user=self.user, status=self.status, address=self.address)

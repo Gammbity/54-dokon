@@ -105,13 +105,7 @@ class OrderCreateSerializer(serializers.ModelSerializer):
         if request and hasattr(request, 'user'):
             fields['existing_addresses'].queryset = Address.objects.filter(user=request.user)
         return fields
-
-class OrderSerializer(serializers.Serializer):
-    existing_addresses = serializers.PrimaryKeyRelatedField(
-        queryset=Address.objects.all(), required=False, allow_null=True
-    )
-    address = serializers.JSONField(required=False, allow_null=True)
-
+    
     def validate(self, data):
         user = self.context["request"].user
 
@@ -125,7 +119,7 @@ class OrderSerializer(serializers.Serializer):
             if not isinstance(address, dict) or "location" not in address:
                 raise serializers.ValidationError({"address": _("Manzil noto‘g‘ri formatda!")})
 
-        data["address"] = existing_addresses or address
+        data["address"] = existing_addresses or Address.objects.create(user=user, **address)
 
         basket = Basket.objects.filter(user=user).prefetch_related("items__product").first()
         if not basket:

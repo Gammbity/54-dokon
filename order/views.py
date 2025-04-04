@@ -29,7 +29,7 @@ class OrderCreateView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
-        serializer = serializers.OrderSerializer(data=request.data, context={"request": request})
+        serializer = serializers.OrderCreateSerializer(data=request.data, context={"request": request})
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
