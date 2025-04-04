@@ -74,13 +74,13 @@ class RegistrationBotSerializer(serializers.ModelSerializer):
         fields = ['password']
 
 class UsernamePasswordSerializer(serializers.ModelSerializer):
-    password1 = serializers.CharField(write_only=True)  
+    new_password = serializers.CharField(write_only=True)  
     username = serializers.CharField(allow_null=True)
     class Meta:
         model = User
-        fields = ['password' ,'username', 'password1'] 
+        fields = ['password' ,'username', 'new_password'] 
 
     def validate_password1(self, value):
-        print(f"Validating password1: {value}")  
+        print(f"Validating new_password: {value}")  
         return custom_validate_password(value)
         
