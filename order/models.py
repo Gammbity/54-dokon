@@ -11,7 +11,7 @@ class Basket(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self) -> str:
-        return f"{self.user.get_full_name()} - {self.id}"
+        return f"{self.user.username}ning Savati"
     
     def clean(self):
         self.items.all().delete()
@@ -54,12 +54,12 @@ class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
     status = models.ForeignKey(Status, on_delete=models.CASCADE, related_name='order_with_status', default=1)
     address = models.ForeignKey(Address, on_delete=models.CASCADE, related_name='order_at_address')
-    total_price = models.PositiveBigIntegerField(null=True)
+    total_price = models.PositiveBigIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self) -> str:
-        return self.user.get_full_name()
+        return f"{self.user.username}ning Buyurtmasi"
 
     class Meta:
         verbose_name = _("buyurtma")
@@ -76,7 +76,7 @@ class OrderItem(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self) -> str:
-        return self.order.user.get_full_name()
+        return f"{self.order.user.username}ning Buyurtma elementi"
 
 
     class Meta:
@@ -95,7 +95,7 @@ class BasketItem(models.Model):
 
 
     def __str__(self):
-        return f"{self.basket.user.get_full_name()} - {self.basket}"
+        return f"{self.basket.user.username}ning Savat elementi"
     
     class Meta:
         verbose_name = _("Savat elementi")

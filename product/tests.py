@@ -42,6 +42,6 @@ class CategoryTestCase(TestCase):
             "name": "Electro",
         }
 
-        response = self.client.post(reverse("category-list"), json.dumps(category), content_type='application/json')
+        response = self.client.post(reverse("admin-category-list"), json.dumps(category), content_type='application/json')
         self.assertEqual(response.status_code, 201)
         self.assertIn("Electro", response.data['name'])

@@ -5,10 +5,10 @@ from order.models import Order, Basket, OrderItem, Address, Status, BasketItem
 class OrderAdmin(admin.ModelAdmin):
     list_display = ['id' ,'user']
     list_display_links = ['user']
-    readonly_fields = ['total_price']
+    # readonly_fields = ['total_price']
 
-    def has_add_permission(self, request):
-        return False
+    # def has_add_permission(self, request):
+    #     return False
 
 @admin.register(BasketItem)
 class BasketItemAdmin(admin.ModelAdmin):
@@ -40,4 +40,4 @@ class StatusAdmin(admin.ModelAdmin):
 class OrerItemtAdmin(admin.ModelAdmin):
     list_display = ['order', 'product', 'id']
     list_display_link = ['order', 'product']
-    readonly_fields = ['order', 'product', 'price', 'quantity']
+    # readonly_fields = ['order', 'product', 'price', 'quantity']

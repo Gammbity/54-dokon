@@ -4,6 +4,7 @@ from product.serializers import ProductSerializer
 from django.utils.translation import gettext_lazy as _
 from product.models import Product
 from user.models import User
+from user.serializers import UserSerializer
 
 
 class BasketItemSerializer(serializers.ModelSerializer):
@@ -134,5 +135,34 @@ class OrderCreateSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError({f"product_{item.product.id}": _("Ushbu mahsulotlar soni yetarli emas!")})
 
         return data
-
     
+# ADMIN ---------------------------------------------------------
+
+class OrderAdminSerializer(serializers.ModelSerializer):
+    user = serializers.CharField(read_only=True)
+    status = StatusSerializer
+    address = AddressSerializer(read_only=True)
+    total_price = serializers.IntegerField(read_only=True)
+    class Meta:
+        model = Order
+        fields = ['user', 'status', 'address', 'total_price', 'created_at', 'updated_at']
+
+class OrderItemAdminSerializer(serializers.ModelSerializer):
+    product = serializers.CharField(read_only=True)
+    class Meta:
+        model = OrderItem
+        fields = ["product", "order", "price", "quantity", "created_at", "updated_at"]
+
+class BasketAdminSerializer(serializers.ModelSerializer):
+    user = serializers.CharField(read_only=True)
+    total_price = serializers.IntegerField(read_only=True)
+    class Meta:
+        model = Basket
+        fields = ['user', 'total_price', 'created_at', 'updated_at']
+
+class BasketItemAdminSerializer(serializers.ModelSerializer):
+    product = serializers.CharField(read_only=True)
+    basket = serializers.CharField(read_only=True)
+    class Meta:
+        model = BasketItem
+        fields = ["product", "basket", "price", "quantity", "created_at", "updated_at"]
