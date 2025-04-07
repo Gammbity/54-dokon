@@ -83,4 +83,10 @@ class UsernamePasswordSerializer(serializers.ModelSerializer):
     def validate_password1(self, value):
         print(f"Validating new_password: {value}")  
         return custom_validate_password(value)
-        
+
+
+class UserAdminSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'first_name', 'last_name', 'username', 'email', 'phone'] 
+        read_only_fields = fields

@@ -1,5 +1,8 @@
 from django.test import TestCase
+from django.urls import reverse
+
 from user.models import User, UsersPassword
+
 from datetime import datetime
 
 class UserViewTest(TestCase):
@@ -65,3 +68,29 @@ class UserRegistrationTest(TestCase):
         response = self.client.post("/api/v1/user/registration/", data=user) 
         self.assertEqual(response.status_code, 201)
         self.assertIn('access_token', response.data)
+
+
+class AdminTest(TestCase):
+
+    def setUp(self):
+        self.admin = User.objects.create_superuser(username='admin', password="Qwerty123$")
+        self.client.login(username='admin', password="Qwerty123$")
+        self.user = User.objects.create_user(
+            first_name="Ali",
+            last_name="Aliyev",
+            username="testuser",
+            email="test@gmail.com",
+            phone="+998880334626",
+            password="Qwerty1234root"
+        )
+
+    def test_get_user(self):
+        url = reverse('admin-users-list')
+        response = self.client.get(url)
+        self.assertEqual(response.data[0]['id'], 2)
+        self.assertEqual(response.status_code, 200)
+
+    def test_delete_user(self):
+        url = reverse('admin-users-detail', args=[self.user.id])
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 204)

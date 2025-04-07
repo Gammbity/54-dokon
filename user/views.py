@@ -2,8 +2,8 @@ from user.models import User, UsersPassword
 from user import serializers
 from config.settings import SECRET_KEY
 
-from rest_framework import generics
-from rest_framework.permissions import IsAuthenticated
+from rest_framework import generics, viewsets
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -15,10 +15,6 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.hashers import check_password, make_password
 
-from datetime import datetime
-from config.settings import SECRET_KEY
-from datetime import timedelta
-import jwt
 
 def response_token_cookie(user, message):
     refresh_token = RefreshToken.for_user(user)
@@ -158,4 +154,8 @@ class UsernamePasswordEditView(generics.GenericAPIView):
         user.save()
         return Response(status=status.HTTP_200_OK)
 
-    
+class UserAdminView(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = serializers.UserAdminSerializer
+    http_method_names = ['get', 'delete']
+    permission_classes = [IsAdminUser]
