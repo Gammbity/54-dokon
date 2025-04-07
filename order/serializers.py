@@ -149,6 +149,7 @@ class OrderAdminSerializer(serializers.ModelSerializer):
 
 class OrderItemAdminSerializer(serializers.ModelSerializer):
     product = serializers.CharField(read_only=True)
+    order = serializers.CharField(read_only=True)
     class Meta:
         model = OrderItem
         fields = ["product", "order", "price", "quantity", "created_at", "updated_at"]
