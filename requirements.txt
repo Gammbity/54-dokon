@@ -16,7 +16,7 @@ click-didyoumean==0.3.1
 click-plugins==1.1.1
 click-repl==0.3.0
 colorama==0.4.6
-Django==5.1.7
+Django==5.2
 django-celery-results==2.5.1
 django-ckeditor==6.7.1
 django-cors-headers==4.6.0
@@ -43,14 +43,15 @@ packaging==24.1
 pillow==10.4.0
 prompt_toolkit==3.0.48
 propcache==0.2.0
-psycopg2==2.9.9
-psycopg2-binary==2.9.9
+psycopg2==2.9.10
+psycopg2-binary==2.9.10
 pydantic==2.9.2
 pydantic_core==2.23.4
 PyJWT==2.9.0
 python-dateutil==2.9.0.post0
 pytz==2024.2
 PyYAML==6.0.2
+redis==5.2.1
 schedule==1.2.2
 six==1.16.0
 sqlparse==0.5.1

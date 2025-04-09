@@ -88,5 +88,10 @@ class UsernamePasswordSerializer(serializers.ModelSerializer):
 class UserAdminSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'first_name', 'last_name', 'username', 'email', 'phone'] 
+        fields = ['id', 'first_name', 'last_name', 'username', 'email', 'phone', 'is_active', 'is_staff', 'is_superuser'] 
         read_only_fields = fields
+
+class ChangeUserPermissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username']

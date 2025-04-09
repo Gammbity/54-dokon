@@ -1,14 +1,20 @@
-FROM python:3.9-slim
+FROM python:3.10-slim
 
 WORKDIR /app
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-RUN python -m pip install --upgrade pip
+RUN apt-get update && apt-get install -y \
+    postgresql-server-dev-all \
+    gcc \
+    python3-dev
+
+RUN python -m pip install --upgrade pip wheel setuptools
+
+COPY requirements.txt /app/
+RUN pip install -r requirements.txt
 
 COPY . /app
 
-RUN pip install -r requirements.txt
-
-CMD ["python3.10", "manage.py", "runserver"]
+CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000"]

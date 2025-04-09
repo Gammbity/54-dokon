@@ -1,13 +1,12 @@
-from django.shortcuts import get_object_or_404
+from product import serializers
+from product import models
 
 from rest_framework import generics, viewsets
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework import status
 
-from product import models
-from product import serializers
-
+from django.shortcuts import get_object_or_404
 
 
 class ProductListView(generics.ListAPIView):

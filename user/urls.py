@@ -1,8 +1,8 @@
-from django.urls import path
-
 from user import views
 
 from rest_framework.routers import DefaultRouter
+
+from django.urls import path
 
 router = DefaultRouter()
 
@@ -15,6 +15,7 @@ urlpatterns = [
     path("logout/", views.LogOutView.as_view(), name='logout'),
     path("login/", views.LoginView.as_view(), name='login'),
     path("edit/password/", views.UsernamePasswordEditView.as_view(), name='edit-password'),
+    path('change-user-permission/', views.ChangeUserPermissionView.as_view(), name='upgrade-user'),
 ]
 
 urlpatterns += router.urls
