@@ -166,3 +166,4 @@ cython_debug/
 .vscode/
 .static/
 .upload/
+.postgres_data/
