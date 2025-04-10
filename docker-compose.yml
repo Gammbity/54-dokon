@@ -28,7 +28,7 @@ services:
     networks:
       - app_network
 
-  nginx:
+  54-nginx:
     image: nginx:latest 
     ports:
       - "86:80"
@@ -39,7 +39,7 @@ services:
     networks:
       - app_network
 
-  postgres: 
+  54-postgres: 
     image: postgres:latest 
     container_name: postgres 
     env_file:
