@@ -10,6 +10,9 @@ gun:
 make:
 	python manage.py makemigrations
 
+coll:
+	python manage.py collectstatic
+
 admin:
 	python manage.py createsuperuser
 

@@ -96,10 +96,6 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 
-print(env("POSTGRES_DB"),env("POSTGRES_USER"),
-env("POSTGRES_PASSWORD"),
-env("DB_HOST"),
-env("POSTGRES_PORT"))
 
 DATABASES = {
     'default': {
@@ -188,6 +184,8 @@ CORS_ALLOW_CREDENTIALS = True
 
 CSRF_TRUSTED_ORIGINS = [
     'https://54-dokon.hojiakbar.me',
+    'http://localhost:86',
+    'http://127.0.0.1:86',
     # Add any other origins you trust
 ]
 
