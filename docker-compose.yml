@@ -2,22 +2,22 @@ services:
   backend:
     container_name: 54-dokon
     image: 54-dokon-image
+    command: ./start.sh
     build: ./
     volumes:
       - ./:/app
-    ports: 
-      - 8000:8000
     env_file:
       - .env
     depends_on:
       - redis
-      - postgres_db
     restart: unless-stopped
     networks:
       - app_network
 
   redis:
     image: redis:7-alpine
+    networks:
+      - app_network
 
   celery:
     build: .
@@ -29,6 +29,8 @@ services:
       - backend
     env_file:
       - .env
+    networks:
+      - app_network
 
   nginx:
     image: nginx:latest 
@@ -41,16 +43,15 @@ services:
     networks:
       - app_network
 
-  postgres_db:
-    image: postgres:17
-    environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${DB_NAME}
-    ports:
-      - "${DB_PORT}:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+  postgres: 
+    image: postgres:latest 
+    container_name: postgres 
+    env_file:
+      - .env
+    volumes: 
+      - ./postgres_data:/var/lib/postgresql/data 
+    networks: 
+      - app_network
 
 
 networks:
