@@ -187,7 +187,7 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 
 CSRF_TRUSTED_ORIGINS = [
-    'http://localhost:81',
+    'https://54-dokon.hojiakbar.me',
     # Add any other origins you trust
 ]
 
